@@ -573,22 +573,34 @@
                 <span id="arrow-packing-list" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-packing-list" class="p-4 hidden">
-                <div class="mb-4 flex">
-                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-item-input">
-                    <button id="addItemButton" class="add-item-btn">Ajmer</button>
+                <div class="mb-4 flex items-center">
+                    <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="add-item-input">
+                    <button id="unlockButton" class="add-item-btn bg-blue-500 hover:bg-blue-700">Déverrouiller</button>
+                </div>
+                <p id="passwordMessage" class="text-sm text-red-600 mb-2 hidden">Mot de passe incorrect.</p>
+
+                <div class="mb-4 flex" id="packingListControls">
+                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-item-input" disabled>
+                    <button id="addItemButton" class="add-item-btn" disabled>Ajouter</button>
                 </div>
                 <div id="packingListItems" class="text-gray-800">
                     <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
+                    <p class="text-center text-gray-500 p-4" id="packingListStatus">Chargement de la liste...</p>
                 </div>
                 <p class="text-xs text-gray-500 mt-2">Cochez les articles une fois qu'ils sont emballés. Vous pouvez ajouter ou supprimer des articles.</p>
+                <p class="text-xs text-gray-500 mt-1">Votre identifiant utilisateur pour cette session est : <span id="userIdDisplay" class="font-bold">Chargement...</span></p>
             </div>
         </div>
 
     </div>
 
-    <script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // --- CONFIGURATION OPENWEATHERMAP ---
-        // Votre clé API OpenWeatherMap est déjà intégrée ici.
         const OPENWEATHER_API_KEY = "51aebd101995305de8a90d128247bdad"; 
 
         // Fonction JavaScript pour basculer la visibilité du contenu du jour
@@ -811,92 +823,198 @@
             }
         }
 
-        // --- Logique de la Liste de Colisage (avec stockage local) ---
+        // --- Logique de la Liste de Colisage (avec Firestore et protection par mot de passe) ---
+        let db;
+        let auth;
+        let userId = 'Chargement...'; // Initialisation temporaire
+        let appId; // Déclarer appId ici pour qu'il soit accessible dans le module
+        let packingListColRef;
+
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockButton = document.getElementById('unlockButton');
+        const passwordMessage = document.getElementById('passwordMessage');
+        const packingListControls = document.getElementById('packingListControls');
         const newItemInput = document.getElementById('newItemInput');
         const addItemButton = document.getElementById('addItemButton');
         const packingListItems = document.getElementById('packingListItems');
+        const packingListStatus = document.getElementById('packingListStatus');
+        const userIdDisplay = document.getElementById('userIdDisplay');
 
-        // Fonction pour créer un nouvel élément de liste (DOM)
-        function createPackingListItemElement(text, isChecked = false) {
-            const itemId = `item-${Date.now()}`; // ID unique pour l'élément
+        const UNLOCK_PASSWORD = "EP2025"; // Le mot de passe pour déverrouiller la modification
 
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'packing-list-item';
-            itemDiv.setAttribute('data-item-id', itemId); // Pour faciliter la suppression
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = itemId;
-            checkbox.checked = isChecked;
-            checkbox.addEventListener('change', savePackingList); // Sauvegarder l'état au changement
-
-            const label = document.createElement('label');
-            label.htmlFor = itemId;
-            label.textContent = text;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-btn';
-            deleteButton.textContent = 'Supprimer';
-            deleteButton.addEventListener('click', () => {
-                itemDiv.remove(); // Supprime l'élément du DOM
-                savePackingList(); // Sauvegarde la liste après suppression
+        // Fonction pour activer/désactiver les contrôles de la liste de colisage
+        function enablePackingListEdit(enabled) {
+            newItemInput.disabled = !enabled;
+            addItemButton.disabled = !enabled;
+            // Activer/désactiver les boutons de suppression sur les éléments existants
+            packingListItems.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.disabled = !enabled;
             });
-
-            itemDiv.appendChild(checkbox);
-            itemDiv.appendChild(label);
-            itemDiv.appendChild(deleteButton);
-
-            return itemDiv;
+            packingListItems.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.disabled = !enabled;
+            });
         }
 
-        // Fonction pour charger la liste de colisage depuis le stockage local
-        function loadPackingList() {
-            const savedList = localStorage.getItem('packingList');
-            if (savedList) {
-                const items = JSON.parse(savedList);
-                packingListItems.innerHTML = ''; // Vide la liste actuelle
-                items.forEach(item => {
-                    packingListItems.appendChild(createPackingListItemElement(item.text, item.checked));
-                });
+        // Gestionnaire pour le bouton de déverrouillage
+        unlockButton.addEventListener('click', () => {
+            if (passwordInput.value === UNLOCK_PASSWORD) {
+                enablePackingListEdit(true);
+                passwordInput.classList.add('hidden'); // Cache l'input du mot de passe
+                unlockButton.classList.add('hidden'); // Cache le bouton de déverrouillage
+                passwordMessage.classList.add('hidden'); // Cache le message d'erreur
             } else {
-                // Ajouter des articles initiaux si aucune liste n'est sauvegardée
-                packingListItems.appendChild(createPackingListItemElement("Passeports / Cartes d'identité"));
-                packingListItems.appendChild(createPackingListItemElement("Billets (train/avion/parcs)"));
-                packingListItems.appendChild(createPackingListItemElement("Chargeurs de téléphone"));
-                packingListItems.appendChild(createPackingListItemElement("Maillots de bain et serviettes"));
-                packingListItems.appendChild(createPackingListItemElement("Trousse de premiers secours"));
-                savePackingList(); // Sauvegarder la liste initiale
-            }
-        }
-
-        // Fonction pour sauvegarder la liste de colisage dans le stockage local
-        function savePackingList() {
-            const itemsToSave = [];
-            packingListItems.querySelectorAll('.packing-list-item').forEach(itemDiv => {
-                const checkbox = itemDiv.querySelector('input[type="checkbox"]');
-                const label = itemDiv.querySelector('label');
-                itemsToSave.push({
-                    text: label.textContent,
-                    checked: checkbox.checked
-                });
-            });
-            localStorage.setItem('packingList', JSON.stringify(itemsToSave));
-        }
-
-        // Gérer l'ajout d'un nouvel article
-        addItemButton.addEventListener('click', () => {
-            const itemText = newItemInput.value.trim();
-            if (itemText) {
-                packingListItems.appendChild(createPackingListItemElement(itemText));
-                newItemInput.value = ''; // Effacer l'input
-                savePackingList(); // Sauvegarder la nouvelle liste
+                passwordMessage.textContent = "Mot de passe incorrect.";
+                passwordMessage.classList.remove('hidden');
             }
         });
 
-        // Permettre l'ajout avec la touche Entrée
-        newItemInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                addItemButton.click(); // Simule un clic sur le bouton Ajouter
+        // Fonction d'initialisation de Firebase et de l'authentification
+        async function initializeFirebase() {
+            try {
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing. Cannot initialize Firebase.");
+                    packingListStatus.textContent = "Erreur: Configuration Firebase manquante.";
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Gérer l'authentification
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        userIdDisplay.textContent = userId;
+                        console.log("Utilisateur connecté:", userId);
+                        packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
+                        setupPackingListListener(); // Démarrer l'écoute de la liste de colisage
+                    } else {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            try {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } catch (error) {
+                                console.error("Erreur de connexion avec token initial:", error);
+                                await signInAnonymously(auth);
+                            }
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation de Firebase:", error);
+                packingListStatus.textContent = "Erreur: Impossible d'initialiser Firebase.";
+            }
+        }
+
+        // Configure l'écouteur en temps réel pour la liste de colisage
+        function setupPackingListListener() {
+            // Utilisation de orderBy pour trier par createdAt, ce qui est recommandé pour les listes
+            const q = query(packingListColRef, orderBy('createdAt'));
+            onSnapshot(q, (snapshot) => {
+                const items = [];
+                snapshot.forEach((doc) => {
+                    items.push({ id: doc.id, ...doc.data() });
+                });
+                renderPackingList(items);
+            }, (error) => {
+                console.error("Erreur lors de la récupération de la liste de colisage:", error);
+                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage.";
+            });
+        }
+
+        // Rend la liste de colisage dans l'interface utilisateur
+        function renderPackingList(items) {
+            packingListItems.innerHTML = ''; // Vide le conteneur existant
+            if (items.length === 0) {
+                packingListItems.innerHTML = '<p class="text-center text-gray-500 p-4">Votre liste est vide. Ajoutez des éléments !</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `packing-list-item ${item.checked ? 'checked' : ''} bg-white hover:bg-gray-50`;
+                itemDiv.dataset.id = item.id; // Stocke l'ID du document Firestore
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `item-${item.id}`; // Utilise l'ID Firestore pour l'ID HTML
+                checkbox.checked = item.checked;
+                checkbox.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
+                checkbox.addEventListener('change', () => toggleItem(item.id, item.checked));
+
+                const label = document.createElement('label');
+                label.htmlFor = `item-${item.id}`;
+                label.textContent = item.text;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
+                deleteButton.addEventListener('click', () => deleteItem(item.id));
+
+                itemDiv.appendChild(checkbox);
+                itemDiv.appendChild(label);
+                itemDiv.appendChild(deleteButton);
+
+                packingListItems.appendChild(itemDiv);
+            });
+            packingListStatus.textContent = ''; // Cache le statut de chargement si des éléments sont affichés
+        }
+
+        // Ajoute un nouvel élément à la liste de colisage
+        async function addItem() {
+            const newItemText = newItemInput.value.trim();
+            if (newItemText === '') {
+                console.warn("Le champ ne peut pas être vide.");
+                return;
+            }
+
+            try {
+                await addDoc(packingListColRef, {
+                    text: newItemText,
+                    checked: false,
+                    createdAt: serverTimestamp(), // Utilise le timestamp du serveur pour le tri
+                    createdBy: userId
+                });
+                newItemInput.value = ''; // Vide l'input après ajout
+            } catch (error) {
+                console.error("Erreur lors de l'ajout de l'élément:", error);
+            }
+        }
+
+        // Bascule l'état coché/décoché d'un élément de la liste de colisage
+        async function toggleItem(itemId, currentCheckedStatus) {
+            try {
+                await updateDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId), {
+                    checked: !currentCheckedStatus
+                });
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de l'élément:", error);
+            }
+        }
+
+        // Supprime un élément de la liste de colisage
+        async function deleteItem(itemId) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) { // Utilisation de confirm pour une action destructive
+                try {
+                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
+                } catch (error) {
+                    console.error("Erreur lors de la suppression de l'élément:", error);
+                }
+            }
+        }
+
+        // Événements pour ajouter un élément à la liste de colisage
+        addItemButton.addEventListener('click', addItem);
+        newItemInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !newItemInput.disabled) {
+                addItem();
             }
         });
 
@@ -905,7 +1023,8 @@
             startCountdown(); // Démarre le compte à rebours
             updateDayHighlight(); // Met en évidence le jour actuel
             loadAllWeather(); // Charge la météo
-            loadPackingList(); // Charge la liste de colisage (locale)
+            initializeFirebase(); // Initialise Firebase et toutes les fonctionnalités Firestore
+            enablePackingListEdit(false); // Désactive les contrôles par défaut
         };
     </script>
 </body>
