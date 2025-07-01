@@ -352,7 +352,6 @@
                     <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
                 </div>
                 <p class="text-xs text-gray-500 mt-2">Cochez les articles une fois qu'ils sont emballés. Vous pouvez ajouter ou supprimer des articles.</p>
-                <div class="text-xs text-gray-500 mt-2">Votre ID utilisateur pour cette session : <span id="userIdDisplay" class="font-bold">Chargement...</span></div>
             </div>
         </div>
 
@@ -368,7 +367,7 @@
                     <li class="font-semibold text-lg text-blue-600">Aller :</li>
                     <ul class="list-circle list-inside ml-4 space-y-1">
                         <li>Charvieu-Chavagneux -> Colmar : ~4h (avec 1h de pause repas incluse) (<a href="waze://?q=Colmar&navigate=yes&from=Charvieu-Chavagneux" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
-                        <li>Colmar -> Château du Haut-Kœnigsbourg : ~40 min (<a href="waze://?q=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg&navigate=yes&from=Colmar" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Colmar -> Château du Haut-Kœnigsbourg : ~40 min (<a href="waze://?q=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
                         <li>Château du Haut-Kœnigsbourg -> Europa-Park (Rust) : ~1h (<a href="waze://?q=Europa-Park%20Rust&navigate=yes&from=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
                     </ul>
                     <li class="font-semibold text-lg text-blue-600 mt-4">Retour :</li>
@@ -499,71 +498,26 @@
             </div>
             <div id="content-summary-weather" class="p-4 hidden">
                 <div id="weatherDisplay" class="text-gray-800">
-                    <!-- Le contenu météo sera chargé ici par JavaScript -->
+                    <ul class="list-disc list-inside space-y-2 text-gray-800">
+                        <li><span class="font-semibold">Colmar (20-21 juillet) :</span> <span id="weather-colmar">Chargement...</span></li>
+                        <li><span class="font-semibold">Europa-Park / Rust (21-25 juillet) :</span> <span id="weather-rust">Chargement...</span></li>
+                        <li><span class="font-semibold">Strasbourg (25-26 juillet) :</span> <span id="weather-strasbourg">Chargement...</span></li>
+                        <li><span class="font-semibold">Salins-les-Bains / Jura (27 juillet) :</span> <span id="weather-salins">Chargement...</span></li>
+                    </ul>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">Ces données sont estimées et ne sont pas des prévisions en temps réel.</p>
+                <p class="text-xs text-gray-500 mt-2">Ces données sont des prévisions en temps quasi-réel via OpenWeatherMap.</p>
             </div>
         </div>
 
     </div>
 
-    <script type="module">
-        // Import des modules Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Variables globales pour Firebase
-        let db;
-        let auth;
-        let currentUserId = 'loading...'; // Initialisation temporaire
-        let appId; // Variable pour l'ID de l'application
-
-        // Initialisation de Firebase
-        async function initializeFirebase() {
-            // Récupération de l'ID de l'application depuis l'environnement Canvas
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-
-            if (Object.keys(firebaseConfig).length === 0) {
-                console.error("Firebase config is missing. Cannot initialize Firebase.");
-                document.getElementById('userIdDisplay').textContent = 'Erreur: Firebase non configuré';
-                return;
-            }
-
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            // Authentification anonyme
-            try {
-                // Utilise __initial_auth_token si disponible, sinon signe anonymement
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Erreur d'authentification Firebase :", error);
-                document.getElementById('userIdDisplay').textContent = 'Erreur d\'authentification';
-            }
-
-            // Écoute les changements d'état d'authentification
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUserId = user.uid;
-                    document.getElementById('userIdDisplay').textContent = currentUserId;
-                    // Une fois authentifié, charge la liste de colisage
-                    loadPackingList();
-                } else {
-                    currentUserId = 'anonymous';
-                    document.getElementById('userIdDisplay').textContent = 'Anonyme';
-                    // Si déconnecté, vide la liste pour éviter d'afficher des données non pertinentes
-                    packingListItems.innerHTML = '';
-                }
-            });
-        }
-
+    <script>
+        // --- CONFIGURATION OPENWEATHERMAP (À REMPLIR PAR VOS SOINS) ---
+        // 1. Allez sur openweathermap.org et créez un compte gratuit.
+        // 2. Une fois connecté, allez dans "My API keys" pour générer votre clé.
+        // 3. Collez votre clé ci-dessous.
+        // REMPLACEZ "VOTRE_CLE_API_OPENWEATHER" par votre clé réelle.
+        const OPENWEATHER_API_KEY = "51aebd101995305de8a90d128247bdad"; 
 
         // JavaScript function to toggle the visibility of day content
         window.toggleDay = function(dayId) {
@@ -578,27 +532,49 @@
             }
         }
 
-        // --- Météo Simulée affichée directement ---
-        const weatherDisplay = document.getElementById('weatherDisplay');
+        // --- Météo en temps réel via OpenWeatherMap ---
+        async function fetchWeatherForCity(city, elementId) {
+            const weatherElement = document.getElementById(elementId);
+            if (!weatherElement) return;
 
-        // Données météo simulées
-        const simulatedWeatherData = {
-            colmar: { temp: "27°C", condition: "☀️ Ensoleillé" },
-            europaPark: { temp: "28°C", condition: "☀️ Ensoleillé" },
-            strasbourg: { temp: "24°C", condition: "☀️ Ensoleillé" },
-            salinsLesBains: { temp: "23°C", condition: "☀️ Ensoleillé" }
-        };
+            if (OPENWEATHER_API_KEY === "51aebd101995305de8a90d128247bdad" || !OPENWEATHER_API_KEY) {
+                weatherElement.innerHTML = `Clé API OpenWeather manquante ou non valide.`;
+                console.error("OpenWeather API key is missing or invalid. Please replace 'VOTRE_CLE_API_OPENWEATHER' with your actual key.");
+                return;
+            }
 
-        function displaySimulatedWeather() {
-            const weatherHtml = `
-                <ul class="list-disc list-inside space-y-2 text-gray-800">
-                    <li><span class="font-semibold">Colmar (20-21 juillet) :</span> ${simulatedWeatherData.colmar.condition}, Max ${simulatedWeatherData.colmar.temp} / Min 16°C.</li>
-                    <li><span class="font-semibold">Europa-Park / Rust (21-25 juillet) :</span> ${simulatedWeatherData.europaPark.condition}, Max ${simulatedWeatherData.europaPark.temp} / Min 17°C.</li>
-                    <li><span class="font-semibold">Strasbourg (25-26 juillet) :</span> ${simulatedWeatherData.strasbourg.condition}, Max ${simulatedWeatherData.strasbourg.temp} / Min 15°C.</li>
-                    <li><span class="font-semibold">Salins-les-Bains / Jura (27 juillet) :</span> ${simulatedWeatherData.salinsLesBains.condition}, Max ${simulatedWeatherData.salinsLesBains.temp} / Min 12°C.</li>
-                </ul>
-            `;
-            weatherDisplay.innerHTML = weatherHtml;
+            // Utilisation de 'units=metric' pour les degrés Celsius et 'lang=fr' pour la description en français
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    // Gérer les erreurs HTTP (ex: 404 ville non trouvée, 401 clé invalide)
+                    throw new Error(`Erreur HTTP: ${response.status} pour ${city}`);
+                }
+                const data = await response.json();
+
+                const temperature = Math.round(data.main.temp); // Température arrondie
+                const description = data.weather[0].description; // Description du temps
+                const iconCode = data.weather[0].icon; // Code de l'icône météo
+                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`; // URL de l'icône
+
+                weatherElement.innerHTML = `
+                    <img src="${iconUrl}" alt="${description}" class="inline-block w-8 h-8 align-middle mr-1">
+                    ${description.charAt(0).toUpperCase() + description.slice(1)}, ${temperature}°C
+                `;
+            } catch (error) {
+                console.error(`Erreur lors de la récupération de la météo pour ${city}:`, error);
+                weatherElement.innerHTML = `Impossible de charger la météo.`;
+            }
+        }
+
+        // Fonction pour charger la météo pour toutes les villes
+        function loadAllWeather() {
+            fetchWeatherForCity('Colmar', 'weather-colmar');
+            fetchWeatherForCity('Rust', 'weather-rust'); // Rust est la ville où se trouve Europa-Park
+            fetchWeatherForCity('Strasbourg', 'weather-strasbourg');
+            fetchWeatherForCity('Salins-les-Bains', 'weather-salins');
         }
 
         // --- Compte à Rebours ---
@@ -696,46 +672,35 @@
             }
         }
 
-        // --- Logique de la Liste de Colisage avec Firestore ---
+        // --- Logique de la Liste de Colisage (avec stockage local) ---
         const newItemInput = document.getElementById('newItemInput');
         const addItemButton = document.getElementById('addItemButton');
         const packingListItems = document.getElementById('packingListItems');
 
         // Fonction pour créer un nouvel élément de liste (DOM)
-        function createPackingListItemElement(id, text, isChecked = false) {
+        function createPackingListItemElement(text, isChecked = false) {
+            const itemId = `item-${Date.now()}`; // ID unique pour l'élément
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'packing-list-item';
-            itemDiv.setAttribute('data-doc-id', id); // Stocke l'ID du document Firestore
+            itemDiv.setAttribute('data-item-id', itemId); // Pour faciliter la suppression
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.id = `checkbox-${id}`; // ID unique pour la checkbox
+            checkbox.id = itemId;
             checkbox.checked = isChecked;
-            checkbox.addEventListener('change', async () => {
-                // Met à jour l'état dans Firestore
-                if (db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
-                    const itemRef = doc(db, `artifacts/${appId}/public/data/packingList`, id);
-                    await updateDoc(itemRef, { checked: checkbox.checked });
-                } else {
-                    console.warn("Firestore non initialisé ou utilisateur non authentifié pour la mise à jour.");
-                }
-            });
+            checkbox.addEventListener('change', savePackingList); // Sauvegarder l'état au changement
 
             const label = document.createElement('label');
-            label.htmlFor = `checkbox-${id}`; // Correction ici: ajout du '}' manquant et du backtick
+            label.htmlFor = itemId;
             label.textContent = text;
 
             const deleteButton = document.createElement('button');
             deleteButton.className = 'delete-btn';
             deleteButton.textContent = 'Supprimer';
-            deleteButton.addEventListener('click', async () => {
-                // Supprime l'élément de Firestore
-                if (db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
-                    const itemRef = doc(db, `artifacts/${appId}/public/data/packingList`, id);
-                    await deleteDoc(itemRef);
-                } else {
-                    console.warn("Firestore non initialisé ou utilisateur non authentifié pour la suppression.");
-                }
+            deleteButton.addEventListener('click', () => {
+                itemDiv.remove(); // Supprime l'élément du DOM
+                savePackingList(); // Sauvegarde la liste après suppression
             });
 
             itemDiv.appendChild(checkbox);
@@ -745,48 +710,47 @@
             return itemDiv;
         }
 
-        // Fonction pour charger et écouter la liste de colisage depuis Firestore
+        // Fonction pour charger la liste de colisage depuis le stockage local
         function loadPackingList() {
-            if (!db || currentUserId === 'loading...' || currentUserId === 'anonymous') {
-                console.log("En attente de l'initialisation de Firebase ou de l'authentification de l'utilisateur pour charger la liste de colisage.");
-                return;
-            }
-
-            // Chemin de la collection publique pour la liste de colisage
-            const packingListCollectionRef = collection(db, `artifacts/${appId}/public/data/packingList`);
-
-            // Écoute en temps réel les changements
-            onSnapshot(packingListCollectionRef, (snapshot) => {
+            const savedList = localStorage.getItem('packingList');
+            if (savedList) {
+                const items = JSON.parse(savedList);
                 packingListItems.innerHTML = ''; // Vide la liste actuelle
-                snapshot.forEach(doc => {
-                    const item = doc.data();
-                    packingListItems.appendChild(createPackingListItemElement(doc.id, item.text, item.checked));
+                items.forEach(item => {
+                    packingListItems.appendChild(createPackingListItemElement(item.text, item.checked));
                 });
-            }, (error) => {
-                console.error("Erreur lors de l'écoute de la liste de colisage :", error);
-                packingListItems.innerHTML = '<p class="text-red-500">Erreur de chargement de la liste. Veuillez réessayer.</p>';
-            });
+            } else {
+                // Ajouter des articles initiaux si aucune liste n'est sauvegardée
+                packingListItems.appendChild(createPackingListItemElement("Passeports / Cartes d'identité"));
+                packingListItems.appendChild(createPackingListItemElement("Billets (train/avion/parcs)"));
+                packingListItems.appendChild(createPackingListItemElement("Chargeurs de téléphone"));
+                packingListItems.appendChild(createPackingListItemElement("Maillots de bain et serviettes"));
+                packingListItems.appendChild(createPackingListItemElement("Trousse de premiers secours"));
+                savePackingList(); // Sauvegarder la liste initiale
+            }
         }
 
-        // Gérer l'ajout d'un nouvel article à Firestore
-        addItemButton.addEventListener('click', async () => {
+        // Fonction pour sauvegarder la liste de colisage dans le stockage local
+        function savePackingList() {
+            const itemsToSave = [];
+            packingListItems.querySelectorAll('.packing-list-item').forEach(itemDiv => {
+                const checkbox = itemDiv.querySelector('input[type="checkbox"]');
+                const label = itemDiv.querySelector('label');
+                itemsToSave.push({
+                    text: label.textContent,
+                    checked: checkbox.checked
+                });
+            });
+            localStorage.setItem('packingList', JSON.stringify(itemsToSave));
+        }
+
+        // Gérer l'ajout d'un nouvel article
+        addItemButton.addEventListener('click', () => {
             const itemText = newItemInput.value.trim();
-            if (itemText && db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
-                try {
-                    // Ajoute un nouveau document à la collection
-                    await addDoc(collection(db, `artifacts/${appId}/public/data/packingList`), {
-                        text: itemText,
-                        checked: false,
-                        createdAt: new Date() // Ajoute un timestamp pour un éventuel tri
-                    });
-                    newItemInput.value = ''; // Effacer l'input
-                } catch (e) {
-                    console.error("Erreur lors de l'ajout du document : ", e);
-                }
-            } else if (!itemText) {
-                console.warn("Le texte de l'article ne peut pas être vide.");
-            } else {
-                console.warn("Firestore non initialisé ou utilisateur non authentifié pour l'ajout.");
+            if (itemText) {
+                packingListItems.appendChild(createPackingListItemElement(itemText));
+                newItemInput.value = ''; // Effacer l'input
+                savePackingList(); // Sauvegarder la nouvelle liste
             }
         });
 
@@ -798,12 +762,11 @@
         });
 
         // Appelle les fonctions au chargement de la page
-        window.onload = async function() {
-            displaySimulatedWeather();
+        window.onload = function() {
             startCountdown(); // Démarre le compte à rebours
             updateDayHighlight(); // Met en évidence le jour actuel
-            await initializeFirebase(); // Initialise Firebase et l'authentification
-            // loadPackingList() est appelée après l'authentification réussie dans initializeFirebase
+            loadAllWeather(); // Charge la météo
+            loadPackingList(); // Charge la liste de colisage (locale)
         };
     </script>
 </body>
