@@ -402,10 +402,30 @@
             <div id="content-summary-weather" class="p-4 hidden">
                 <div id="weatherDisplay" class="text-gray-800 text-left">
                     <ul class="list-disc list-inside space-y-2 text-gray-800">
-                        <li><span class="font-semibold">Colmar (20-21 juillet) :</span> <span id="weather-colmar">Chargement...</span></li>
-                        <li><span class="font-semibold">Europa-Park / Rust (21-25 juillet) :</span> <span id="weather-rust">Chargement...</span></li>
-                        <li><span class="font-semibold">Strasbourg (25-26 juillet) :</span> <span id="weather-strasbourg">Chargement...</span></li>
-                        <li><span class="font-semibold">Salins-les-Bains / Jura (27 juillet) :</span> <span id="weather-salins">Chargement...</span></li>
+                        <li><span class="font-semibold">Colmar :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-colmar-today">Chargement...</span><br>
+                                Demain : <span id="weather-colmar-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Europa-Park / Rust :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-rust-today">Chargement...</span><br>
+                                Demain : <span id="weather-rust-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Strasbourg :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-strasbourg-today">Chargement...</span><br>
+                                Demain : <span id="weather-strasbourg-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Salins-les-Bains / Jura :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-salins-today">Chargement...</span><br>
+                                Demain : <span id="weather-salins-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
                     </ul>
                 </div>
                 <p class="text-xs text-gray-500 mt-2">Ces données sont des prévisions en temps quasi-réel via OpenWeatherMap.</p>
@@ -585,45 +605,115 @@
         }
 
         // --- Météo en temps réel via OpenWeatherMap ---
-        async function fetchWeatherForCity(city, elementId) {
-            const weatherElement = document.getElementById(elementId);
-            if (!weatherElement) return;
 
-            // La clé API est maintenant directement dans la constante OPENWEATHER_API_KEY
-            // Plus besoin de vérifier si c'est le placeholder.
+        /**
+         * Fetches current and tomorrow's weather data for a given city.
+         * @param {string} city - The name of the city.
+         * @returns {Promise<{current: object, tomorrow: object|null}>} - An object containing current and tomorrow's weather data.
+         */
+        async function fetchWeatherData(city) {
+            const currentWeatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
+            const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
 
-            // Utilisation de 'units=metric' pour les degrés Celsius et 'lang=fr' pour la description en français
-            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
+            let currentWeatherData = null;
+            let tomorrowForecastData = null;
 
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    // Gérer les erreurs HTTP (ex: 404 ville non trouvée, 401 clé invalide)
-                    throw new Error(`Erreur HTTP: ${response.status} pour ${city}`);
+                // Fetch current weather
+                const currentWeatherResponse = await fetch(currentWeatherApiUrl);
+                if (!currentWeatherResponse.ok) {
+                    throw new Error(`Erreur HTTP: ${currentWeatherResponse.status} pour la météo actuelle de ${city}`);
                 }
-                const data = await response.json();
+                currentWeatherData = await currentWeatherResponse.json();
 
-                const temperature = Math.round(data.main.temp); // Température arrondie
-                const description = data.weather[0].description; // Description du temps
-                const iconCode = data.weather[0].icon; // Code de l'icône météo
-                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`; // URL de l'icône
+                // Fetch forecast weather
+                const forecastResponse = await fetch(forecastApiUrl);
+                if (!forecastResponse.ok) {
+                    throw new Error(`Erreur HTTP: ${forecastResponse.status} pour les prévisions de ${city}`);
+                }
+                const forecastData = await forecastResponse.json();
 
-                weatherElement.innerHTML = `
+                // Calculate tomorrow's date
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0); // Set to start of tomorrow
+
+                // Filter forecast data for tomorrow
+                const tomorrowEntries = forecastData.list.filter(entry => {
+                    const entryDate = new Date(entry.dt * 1000); // Convert timestamp to Date object
+                    entryDate.setHours(0, 0, 0, 0); // Set to start of entry day
+                    return entryDate.getTime() === tomorrow.getTime();
+                });
+
+                if (tomorrowEntries.length > 0) {
+                    // Find the entry closest to midday tomorrow for a representative forecast
+                    const middayTomorrow = new Date(tomorrow);
+                    middayTomorrow.setHours(12, 0, 0, 0);
+
+                    tomorrowForecastData = tomorrowEntries.reduce((prev, curr) => {
+                        const prevDiff = Math.abs(new Date(prev.dt * 1000).getTime() - middayTomorrow.getTime());
+                        const currDiff = Math.abs(new Date(curr.dt * 1000).getTime() - middayTomorrow.getTime());
+                        return (currDiff < prevDiff) ? curr : prev;
+                    });
+                }
+
+            } catch (error) {
+                console.error(`Erreur lors de la récupération des données météo pour ${city}:`, error);
+            }
+
+            return { current: currentWeatherData, tomorrow: tomorrowForecastData };
+        }
+
+        /**
+         * Renders weather information into the specified HTML elements.
+         * @param {object} weatherData - The data object containing current and tomorrow's weather.
+         * @param {string} todayElementId - The ID of the HTML element for today's weather.
+         * @param {string} tomorrowElementId - The ID of the HTML element for tomorrow's weather.
+         */
+        function renderWeather(weatherData, todayElementId, tomorrowElementId) {
+            const todayElement = document.getElementById(todayElementId);
+            const tomorrowElement = document.getElementById(tomorrowElementId);
+
+            if (weatherData.current && todayElement) {
+                const temperature = Math.round(weatherData.current.main.temp);
+                const description = weatherData.current.weather[0].description;
+                const iconCode = weatherData.current.weather[0].icon;
+                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+                todayElement.innerHTML = `
                     <img src="${iconUrl}" alt="${description}" class="inline-block w-8 h-8 align-middle mr-1">
                     ${description.charAt(0).toUpperCase() + description.slice(1)}, ${temperature}°C
                 `;
-            } catch (error) {
-                console.error(`Erreur lors de la récupération de la météo pour ${city}:`, error);
-                weatherElement.innerHTML = `Impossible de charger la météo.`;
+            } else if (todayElement) {
+                todayElement.innerHTML = `N/A`;
+            }
+
+            if (weatherData.tomorrow && tomorrowElement) {
+                const temperature = Math.round(weatherData.tomorrow.main.temp);
+                const description = weatherData.tomorrow.weather[0].description;
+                const iconCode = weatherData.tomorrow.weather[0].icon;
+                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+                tomorrowElement.innerHTML = `
+                    <img src="${iconUrl}" alt="${description}" class="inline-block w-8 h-8 align-middle mr-1">
+                    ${description.charAt(0).toUpperCase() + description.slice(1)}, ${temperature}°C
+                `;
+            } else if (tomorrowElement) {
+                tomorrowElement.innerHTML = `N/A`;
             }
         }
 
-        // Fonction pour charger la météo pour toutes les villes
-        function loadAllWeather() {
-            fetchWeatherForCity('Colmar', 'weather-colmar');
-            fetchWeatherForCity('Rust', 'weather-rust'); // Rust est la ville où se trouve Europa-Park
-            fetchWeatherForCity('Strasbourg', 'weather-strasbourg');
-            fetchWeatherForCity('Salins-les-Bains', 'weather-salins');
+        // Function to load weather for all cities
+        async function loadAllWeather() {
+            const cities = [
+                { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
+                { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' }, // Rust is the city where Europa-Park is located
+                { name: 'Strasbourg', todayId: 'weather-strasbourg-today', tomorrowId: 'weather-strasbourg-tomorrow' },
+                { name: 'Salins-les-Bains', todayId: 'weather-salins-today', tomorrowId: 'weather-salins-tomorrow' }
+            ];
+
+            for (const cityInfo of cities) {
+                const data = await fetchWeatherData(cityInfo.name);
+                renderWeather(data, cityInfo.todayId, cityInfo.tomorrowId);
+            }
         }
 
         // --- Compte à Rebours ---
