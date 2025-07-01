@@ -537,7 +537,7 @@
             const weatherElement = document.getElementById(elementId);
             if (!weatherElement) return;
 
-            if (OPENWEATHER_API_KEY === "51aebd101995305de8a90d128247bdad" || !OPENWEATHER_API_KEY) {
+            if (OPENWEATHER_API_KEY === "VOTRE_CLE_API_OPENWEATHER" || !OPENWEATHER_API_KEY) {
                 weatherElement.innerHTML = `Clé API OpenWeather manquante ou non valide.`;
                 console.error("OpenWeather API key is missing or invalid. Please replace 'VOTRE_CLE_API_OPENWEATHER' with your actual key.");
                 return;
