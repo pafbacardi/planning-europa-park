@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning des Vacances en Famille</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Définition du motif SVG pour le fond du CONTENEUR PRINCIPAL */
+        /* Un motif de cercles, couleur bleue très très claire, opacité 0.15 */
+        .subtle-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23e0f2f7' fill-opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-attachment: scroll; /* Le motif défile avec le contenu du conteneur */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Fond gris clair pour le body (pas de motif ici) */
+        }
+        .rotated {
+            transform: rotate(180deg);
+        }
+        /* Styles pour le compte à rebours - Plus discret et sur une seule ligne */
+        .countdown-container {
+            background-color: #f8fafc; /* Very light blue/almost white */
+            border: 1px solid #bfdbfe; /* Light blue border */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem 1rem; /* Adjusted padding */
+            margin-bottom: 1.5rem; /* Reduced margin */
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* subtle shadow */
+            display: flex; /* Use flexbox for horizontal alignment */
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on very small screens */
+        }
+        .countdown-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* semi-bold */
+            color: #1e40af; /* Blue-700 */
+            margin-right: 0.75rem; /* Space between title and time */
+            white-space: nowrap; /* Keep title on one line */
+        }
+        .countdown-time {
+            font-size: 1.5rem; /* Adjusted font size for single line */
+            font-weight: 800; /* extrabold */
+            color: #1d4ed8; /* Blue-800 */
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem; /* Reduced gap between units */
+            flex-wrap: wrap; /* Allow wrapping on very small screens */
+        }
+        .countdown-unit {
+            display: flex;
+            align-items: baseline; /* Align values and labels nicely */
+        }
+        .countdown-value {
+            font-size: 1.5rem; /* Adjusted font size */
+            line-height: 1;
+        }
+        .countdown-label {
+            font-size: 0.625rem; /* text-xs */
+            color: #6b7280; /* Gray-500 */
+            text-transform: uppercase;
+            margin-left: 0.2rem; /* Space between value and label */
+            white-space: nowrap; /* Prevent label from wrapping */
+        }
+        /* Responsive adjustments for countdown */
+        @media (max-width: 640px) {
+            .countdown-container {
+                flex-direction: column;
+                padding: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .countdown-title {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+            }
+            .countdown-time {
+                font-size: 1.2rem;
+                gap: 0.3rem;
+            }
+            .countdown-value {
+                font-size: 1.2rem;
+            }
+            .countdown-label {
+                font-size: 0.5rem;
+            }
+        }
+
+        /* Style pour le jour actuel */
+        .highlight-today {
+            background-color: #d1fae5; /* Light green for highlight */
+            border: 2px solid #10b981; /* Green border */
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); /* Green shadow */
+        }
+
+        /* Styles pour le conteneur principal avec motif */
+        .main-container {
+            background-color: transparent; /* Rendre le fond du conteneur transparent pour voir le motif */
+            color: #333;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="main-container max-w-4xl mx-auto subtle-pattern">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-8">
+            ✈️ Programme des Vacances été 2025 👨‍👩‍👧‍👦
+        </h1>
+
+        <p class="text-center text-gray-700 mb-8 text-lg">
+            Dimanche 20 juillet au Dimanche 27 juillet
+        </p>
+
+        <!-- Nouvelle Section: Compte à Rebours avant les Vacances -->
+        <div class="countdown-container">
+            <div class="countdown-title">Départ dans :</div>
+            <div id="countdown" class="countdown-time">
+                <!-- Le compte à rebours sera affiché ici -->
+            </div>
+        </div>
+
+        <!-- Phase 1: Aller en Alsace et Arrivée à Europa-Park -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2">
+            🗺️ Phase 1 : L'aller en Alsace et Arrivée à Europa-Park
+        </h2>
+
+        <!-- Jour 1 -->
+        <div id="day-2025-07-20" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day1')">
+                <h3 class="text-xl font-semibold">🏡 Jour 1 (Dimanche 20 juillet) : De Charvieu-Chavagneux à Colmar</h3>
+                <span id="arrow-day1" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day1" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">09h30 :</span> 🚗 Départ de Charvieu-Chavagneux</li>
+                    <li><span class="font-semibold">09h30 - 11h30 :</span> 🛣️ Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)</li>
+                    <li><span class="font-semibold">11h30 - 12h30 :</span> 🥪 Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.</li>
+                    <li><span class="font-semibold">12h30 - 14h30 :</span> 🛣️ Reprise du Trajet vers Colmar (environ 2h de route)</li>
+                    <li><span class="font-semibold">14h30 - 15h00 :</span> 🛎️ Arrivée à Colmar et Check-in à l'<a href="https://hotel-primo.fr/" target="_blank" class="text-blue-600 hover:underline">Hôtel Primo</a></li>
+                    <li><span class="font-semibold">15h00 - 17h00 :</span> 🧸 Visite du <a href="https://www.tripadvisor.fr/Attraction_Review-g187073-d3202017-Reviews-Musee_du_Jouet-Colmar_Haut_Rhin_Grand_Est.html" target="_blank" class="text-blue-600 hover:underline">Musée du Jouet de Colmar</a></li>
+                    <li><span class="font-semibold">17h00 - 19h00 :</span> 🚶‍♀️ Balade dans la Petite Venise et le centre historique</li>
+                    <li><span class="font-semibold">19h00 :</span> 🍽️ Dîner à Colmar</li>
+                    <li><span class="font-semibold">21h00 :</span> 😴 Retour à l'hôtel et Nuit</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Jour 2 -->
+        <div id="day-2025-07-21" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day2')">
+                <h3 class="text-xl font-semibold">🏰 Jour 2 (Lundi 21 juillet) : De Colmar au Château du Haut-Kœnigsbourg et Arrivée à Europa-Park</h3>
+                <span id="arrow-day2" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day2" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">09h00 - 10h00 :</span> ☕ Lever et Petit-déjeuner à l'Hôtel Primo Colmar, puis check-out.</li>
+                    <li><span class="font-semibold">10h00 - 10h40 :</span> 🛣️ Route de Colmar au <a href="https://www.youtube.com/watch?v=eL08tOY_gwk" target="_blank" class="text-blue-600 hover:underline">Château du Haut-Kœnigsbourg</a> (environ 40 min de route)</li>
+                    <li><span class="font-semibold">10h40 - 12h40 :</span> ⚔️ Visite du Château du Haut-Kœnigsbourg (environ 2 heures)</li>
+                    <li><span class="font-semibold">12h40 - 13h40 :</span> 🍔 Déjeuner (Pique-nique ou restauration rapide/simple)</li>
+                    <li><span class="font-semibold">13h40 - 14h40 :</span> 🎢 Route du Château du Haut-Kœnigsbourg à <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">Europa-Park (Rust)</a> (environ 1h de route)</li>
+                    <li><span class="font-semibold">15h30 :</span> 🛎️ Arrivée à l'<a href="https://www.europapark.de/fr/sejourner/hotel-4-etoiles-el-andaluz" target="_blank" class="text-blue-600 hover:underline">hôtel El Andaluz</a> et Check-in</li>
+                    <li><span class="font-semibold">Soir :</span> 🌙 Installation et Détente à l'hôtel El Andaluz. Dîner et nuit sur place.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Phase 2: Séjour à Europa-Park et Rulantica -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2">
+            🎢 Phase 2 : Séjour à Europa-Park et Rulantica
+        </h2>
+
+        <!-- Jour 3 -->
+        <div id="day-2025-07-22" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day3')">
+                <h3 class="text-xl font-semibold">🎡 Jour 3 (Mardi 22 juillet) : Journée à Europa-Park</h3>
+                <span id="arrow-day3" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day3" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li>🎉 Profitez de la première journée complète dans le <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">parc d'attractions principal</a>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Jour 4 -->
+        <div id="day-2025-07-23" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day4')">
+                <h3 class="text-xl font-semibold">🎡 Jour 4 (Mercredi 23 juillet) : Journée à Europa-Park</h3>
+                <span id="arrow-day4" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day4" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li>🎢 Deuxième journée pour explorer les différents univers et attractions d'<a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">Europa-Park</a>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Jour 5 (Rulantica) -->
+        <div id="day-2025-07-24" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day5')">
+                <h3 class="text-xl font-semibold">🌊 Jour 5 (Jeudi 24 juillet) : Journée à Rulantica</h3>
+                <span id="arrow-day5" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day5" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li>🏊‍♀️ Préparez-vous pour une journée aquatique et pleine de glissades au <a href="https://bocir-prod-bucket.s3.amazonaws.com/medias/bdw90XUz6T/image/Rulantica_Nordiskturn_Vikingl_p_41676370579122-format1by1.jpg" target="_blank" class="text-blue-600 hover:underline">parc aquatique Rulantica</a> !</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Jour 6 (Europa-Park et Retour) -->
+        <div id="day-2025-07-25" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day6')">
+                <h3 class="text-xl font-semibold">🎡 Jour 6 (Vendredi 25 juillet) : Europa-Park et départ vers Strasbourg</h3>
+                <span id="arrow-day6" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day6" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li>✨ Dernière journée pour profiter de vos attractions préférées ou découvrir ce que vous n'avez pas encore eu le temps de faire à <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">Europa-Park</a>.</li>
+                    <li><span class="font-semibold">Fin de journée :</span> 🛣️ Après avoir profité de votre dernière journée à Europa-Park, prenez la route vers Lingolsheim.</li>
+                    <li><span class="font-semibold">Temps de route :</span> ⏱️ Environ 50 min - 1h de route.</li>
+                    <li><span class="font-semibold">Soir :</span> 🛌 Arrivée et installation à l'<a href="https://www.campanile.com/fr/hotels/campanile-strasbourg-lingolsheim" target="_blank" class="text-blue-600 hover:underline">Hôtel Campanile Strasbourg - Lingolsheim</a>. Dîner et première nuit sur place.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Phase 3: Le Retour via Strasbourg et le Jura -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2">
+            🚗 Phase 3 : Le Retour via Strasbourg et le Jura
+        </h2>
+
+        <!-- Jour 7 -->
+        <div id="day-2025-07-26" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day7')">
+                <h3 class="text-xl font-semibold">🏛️ Jour 7 (Samedi 26 juillet) : Journée complète à Strasbourg</h3>
+                <span id="arrow-day7" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day7" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">08h30 - 09h30 :</span> 🥐 Lever et Petit-déjeuner à l'hôtel.</li>
+                    <li><span class="font-semibold">09h30 - 09h35 :</span> 🚶‍♀️ Marche de l'Hôtel à l'arrêt de bus "Tanneries" (environ 2 min).</li>
+                    <li><span class="font-semibold">09h35 - 10h00 :</span> 🚌 Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min). Plus d'infos sur les transports en commun de Strasbourg sur le site de la <a href="https://www.cts-strasbourg.eu/fr/" target="_blank" class="text-blue-600 hover:underline">CTS</a>.</li>
+                    <li><span class="font-semibold">10h00 - 12h00 :</span> ⛪ Visite de la <a href="https://www.cathedrale-strasbourg.fr/" target="_blank" class="text-blue-600 hover:underline">Cathédrale Notre-Dame de Strasbourg</a>.</li>
+                    <li><span class="font-semibold">12h00 - 14h00 :</span> 🍔 Déjeuner (Pique-nique ou boulangerie/sandwicherie).</li>
+                    <li><span class="font-semibold">14h00 - 15h30 :</span> 🛥️ Excursion en Bateau-Mouche <a href="https://www.batorama.com/fr/" target="_blank" class="text-blue-600 hover:underline">Batorama</a> (Présence à 14h00 pour départ à 14h15).</li>
+                    <li><span class="font-semibold">15h30 - 17h30 :</span> 🏘️ Balade dans la Petite France et les Ponts Couverts.</li>
+                    <li><span class="font-semibold">17h30 - 18h30 :</span> 🌳 Détente au Parc de l'Orangerie (optionnel).</li>
+                    <li><span class="font-semibold">19h00 :</span> 🍕 Dîner à Strasbourg.</li>
+                    <li><span class="font-semibold">21h00 :</span> 😴 Retour à l'hôtel et Nuit.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Jour 8 -->
+        <div id="day-2025-07-27" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day8')">
+                <h3 class="text-xl font-semibold">🏞️ Jour 8 (Dimanche 27 juillet) : De Lingolsheim (Strasbourg) via Salins-les-Bains à Charvieu-Chavagneux</h3>
+                <span id="arrow-day8" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day8" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">08h00 - 09h00 :</span> ☕ Lever et Petit-déjeuner à l'hôtel.</li>
+                    <li><span class="font-semibold">09h00 - 09h30 :</span> 🎒 Préparation et Check-out de l'hôtel.</li>
+                    <li><span class="font-semibold">09h30 - 13h00 :</span> 🛣️ Trajet de Lingolsheim à <a href="https://www.youtube.com/watch?v=7_0Ct1Uazc4&t=5s" target="_blank" class="text-blue-600 hover:underline">Salins-les-Bains</a> (environ 3h30 de route).</li>
+                    <li><span class="font-semibold">13h00 - 14h00 :</span> 🍽️ Déjeuner à Salins-les-Bains.</li>
+                    <li><span class="font-semibold">14h00 - 16h00 :</span> 🧂 Visite des <a href="https://www.youtube.com/watch?v=7_0Ct1Uazc4&t=5s" target="_blank" class="text-blue-600 hover:underline">Grandes Salines de Salins-les-Bains</a> (environ 1h30 à 2h).</li>
+                    <li><span class="font-semibold">16h00 - 18h00 :</span> 🚗 Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).</li>
+                    <li><span class="font-semibold">18h00 :</span> 🏠 Arrivée à votre domicile. Fin des vacances !</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Résumé des Trajets et Temps de Route Estimés -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-trajets')">
+                <h2 class="text-2xl sm:text-3xl font-bold">⏱️ Résumé des Trajets et Temps de Route Estimés</h2>
+                <span id="arrow-summary-trajets" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-trajets" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li class="font-semibold text-lg text-blue-600">Aller :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Charvieu-Chavagneux -> Colmar : ~4h (avec 1h de pause repas incluse) (<a href="waze://?q=Colmar&navigate=yes&from=Charvieu-Chavagneux" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Colmar -> Château du Haut-Kœnigsbourg : ~40 min (<a href="waze://?q=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg&navigate=yes&from=Colmar" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Château du Haut-Kœnigsbourg -> Europa-Park (Rust) : ~1h (<a href="waze://?q=Europa-Park%20Rust&navigate=yes&from=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Retour :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Europa-Park (Rust) -> Campanile Strasbourg - Lingolsheim : ~50 min - 1h (<a href="waze://?q=Campanile%20Strasbourg%20Lingolsheim&navigate=yes&from=Europa-Park%20Rust" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Campanile Strasbourg - Lingolsheim -> Salins-les-Bains : ~3h15 - 3h45 (<a href="waze://?q=Salins-les-Bains&navigate=yes&from=Campanile%20Strasbourg%20Lingolsheim" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Salins-les-Bains -> Charvieu-Chavagneux : ~2h (<a href="waze://?q=Charvieu-Chavagneux&navigate=yes&from=Salins-les-Bains" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                    </ul>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Budget Détaillé des Vacances -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-budget')">
+                <h2 class="text-2xl sm:text-3xl font-bold">💰 Budget Détaillé des Vacances (Estimations)</h2>
+                <span id="arrow-summary-budget" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-budget" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">Séjour complet à Europa-Park (Hôtel El Andaluz + Billets Parcs) :</span> <span class="font-bold text-green-700">2083 €</span></li>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Coût estimé des escales (Nuits, Activités & Transport) :</li>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><span class="font-semibold">Aller (1 nuit d'escale à Colmar) :</span>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Carburant (Jour 1 & 2) : 25€</li>
+                                <li>Péages (Jour 1 & 2) : 25€</li>
+                                <li>Musée du Jouet (Jour 1) : 25€</li>
+                                <li>Nuit Hôtel Primo (Jour 1) : 100€ (confirmé)</li>
+                                <li>Château Haut-Kœnigsbourg (Jour 2) : 20€</li>
+                            </ul>
+                            <span class="font-bold text-green-700">Sous-total Aller : 195 €</span>
+                        </li>
+                        <li class="mt-4"><span class="font-semibold">Retour (2 nuits d'escales à Strasbourg + activités/transport) :</span>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Carburant (Jour 6, 7 & 8) : 60€</li>
+                                <li>Péages (Jour 6, 7 & 8) : 40€</li>
+                                <li>Nuits Campanile (Jour 6 & 7) : 201€ (confirmé pour 2 nuits)</li>
+                                <li>Transports en commun Strasbourg (Jour 7) : 7,20 € (ALSA + Journée Groupe Groupe EMS à prendre sur place)</li>
+                                <li>Bateau-Mouche (Jour 7) : 52,30 € (confirmé)</li>
+                                <li>Grandes Salines (Jour 8) : 30€</li>
+                            </ul>
+                            <span class="font-bold text-green-700">Sous-total Retour : 390.50 €</span>
+                        </li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Total estimé pour toutes les escales (hors repas) :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li><span class="font-bold text-green-700">Total Escales : 585.50 €</span></li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Coût estimé des repas :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Petits-déjeuners (hors El Andaluz) : 96 €</li>
+                        <li>Déjeuners : 480 €</li>
+                        <li>Goûters : 160 €</li>
+                        <li>Dîners : 560 €</li>
+                        <li><span class="font-bold text-green-700">Sous-total Repas : 1296 €</span></li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Budget Total Général Estimé (Europa-Park + Escales + Repas) :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li><span class="font-bold text-green-700">Total Général : 3964.50 €</span></li>
+                    </ul>
+                    <li class="text-sm text-gray-600 mt-4">Ce budget ne comprend pas les dépenses personnelles.</li>
+                    <li class="text-xs text-gray-500 mt-2">Estimation du carburant basée sur une consommation de 8L/100km et un prix de 1.90€/L pour le SP95. Les coûts des péages sont des estimations. Les coûts des repas sont basés sur les estimations fournies pour 4 personnes (3 petits-déjeuners à 8€/pers; 8 déjeuners à 15€/pers; 8 goûters à 5€/pers; 7 dîners à 20€/pers.).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Nouveau tableau récapitulatif des dépenses par poste -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-expenses')">
+                <h2 class="text-2xl sm:text-3xl font-bold">📊 Récapitulatif des Dépenses par Poste</h2>
+                <span id="arrow-summary-expenses" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-expenses" class="p-4 hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead>
+                            <tr class="bg-blue-100 text-blue-800 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">Poste de Dépense</th>
+                                <th class="py-3 px-6 text-right">Coût Estimé (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left whitespace-nowrap">Séjour Europa-Park (Hôtel + Billets)</td>
+                                <td class="py-3 px-6 text-right">2083.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Hébergement (Escales)</td>
+                                <td class="py-3 px-6 text-right">301.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Activités (Escales)</td>
+                                <td class="py-3 px-6 text-right">127.30</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Carburant</td>
+                                <td class="py-3 px-6 text-right">85.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Péages</td>
+                                <td class="py-3 px-6 text-right">65.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Transports en commun Strasbourg</td>
+                                <td class="py-3 px-6 text-right">7.20</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Repas</td>
+                                <td class="py-3 px-6 text-right">1296.00</td>
+                            </tr>
+                            <tr class="font-bold bg-blue-50 text-blue-800">
+                                <td class="py-3 px-6 text-left">Total Général Estimé</td>
+                                <td class="py-3 px-6 text-right">3964.50</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Ce tableau récapitule les dépenses estimées par catégorie. Les montants sont basés sur les détails fournis dans le budget détaillé.</p>
+            </div>
+        </div>
+
+        <!-- Section Météo Actuelle (Simulation) -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-weather')">
+                <h2 class="text-2xl sm:text-3xl font-bold">☀️ Météo Estimée</h2>
+                <span id="arrow-summary-weather" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-weather" class="p-4 hidden">
+                <div id="weatherDisplay" class="text-gray-800">
+                    <!-- Le contenu météo sera chargé ici par JavaScript -->
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Ces données sont estimées et ne sont pas des prévisions en temps réel.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // JavaScript function to toggle the visibility of day content
+        // This function needs to be globally accessible because it's called directly from HTML onclick attributes.
+        window.toggleDay = function(dayId) {
+            const content = document.getElementById(`content-${dayId}`);
+            const arrow = document.getElementById(`arrow-${dayId}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotated');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotated');
+            }
+        }
+
+        // --- Météo Simulée affichée directement ---
+        const weatherDisplay = document.getElementById('weatherDisplay');
+
+        // Données météo simulées
+        const simulatedWeatherData = {
+            colmar: { temp: "27°C", condition: "☀️ Ensoleillé" },
+            europaPark: { temp: "28°C", condition: "☀️ Ensoleillé" },
+            strasbourg: { temp: "24°C", condition: "☀️ Ensoleillé" },
+            salinsLesBains: { temp: "23°C", condition: "☀️ Ensoleillé" }
+        };
+
+        function displaySimulatedWeather() {
+            const weatherHtml = `
+                <ul class="list-disc list-inside space-y-2 text-gray-800">
+                    <li><span class="font-semibold">Colmar (20-21 juillet) :</span> ${simulatedWeatherData.colmar.condition}, Max ${simulatedWeatherData.colmar.temp} / Min 16°C.</li>
+                    <li><span class="font-semibold">Europa-Park / Rust (21-25 juillet) :</span> ${simulatedWeatherData.europaPark.condition}, Max ${simulatedWeatherData.europaPark.temp} / Min 17°C.</li>
+                    <li><span class="font-semibold">Strasbourg (25-26 juillet) :</span> ${simulatedWeatherData.strasbourg.condition}, Max ${simulatedWeatherData.strasbourg.temp} / Min 15°C.</li>
+                    <li><span class="font-semibold">Salins-les-Bains / Jura (27 juillet) :</span> ${simulatedWeatherData.salinsLesBains.condition}, Max ${simulatedWeatherData.salinsLesBains.temp} / Min 12°C.</li>
+                </ul>
+            `;
+            weatherDisplay.innerHTML = weatherHtml;
+        }
+
+        // --- Compte à Rebours ---
+        function startCountdown() {
+            // Date de début des vacances : 20 juillet 2025, 09h30
+            const startDate = new Date('2025-07-20T09:30:00');
+            // Date de fin des vacances : 27 juillet 2025, 18h00
+            const endDate = new Date('2025-07-27T18:00:00');
+
+            const countdownElement = document.getElementById('countdown');
+            const countdownTitleElement = document.querySelector('.countdown-title'); // Sélectionne le titre
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+
+                if (now < startDate.getTime()) {
+                    // Avant le début des vacances
+                    const distance = startDate - now;
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = "Départ dans :";
+                    countdownElement.innerHTML = `
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${days}</span>
+                            <span class="countdown-label">J</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${hours}</span>
+                            <span class="countdown-label">H</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${minutes}</span>
+                            <span class="countdown-label">M</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${seconds}</span>
+                            <span class="countdown-label">S</span>
+                        </div>
+                    `;
+                } else if (now >= startDate.getTime() && now < endDate.getTime()) {
+                    // Pendant les vacances
+                    clearInterval(interval); // Arrête le compte à rebours si les vacances sont commencées
+                    countdownTitleElement.textContent = ""; // Cache le titre
+                    countdownElement.innerHTML = `<div class="text-green-700 font-bold text-base sm:text-lg">🎉 Les vacances ont commencé !</div>`;
+                } else {
+                    // Après la fin des vacances
+                    const elapsedDistance = now - endDate.getTime(); // Temps écoulé depuis la fin des vacances
+                    const days = Math.floor(elapsedDistance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((elapsedDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((elapsedDistance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((elapsedDistance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = ""; // Cache le titre
+                    countdownElement.innerHTML = `
+                        <div class="text-red-700 font-bold text-base sm:text-lg">Vacances terminées 😔</div>
+                        <div class="text-red-600 text-sm mt-1">depuis ${days}J ${hours}H ${minutes}M ${seconds}S</div>
+                    `;
+                    clearInterval(interval); // Arrête le compte à rebours une fois les vacances terminées
+                }
+            }
+
+            // Mettre à jour le compte à rebours toutes les secondes
+            const interval = setInterval(updateCountdown, 1000);
+            updateCountdown(); // Appel initial pour afficher le compte à rebours immédiatement
+        }
+
+        // Fonction pour formater une date en YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Fonction pour mettre à jour la mise en évidence du jour
+        function updateDayHighlight() {
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+
+            // Supprimer la classe de mise en évidence de tous les jours
+            document.querySelectorAll('[id^="day-2025-07-"]').forEach(card => {
+                card.classList.remove('highlight-today');
+            });
+
+            // Ajouter la classe de mise en évidence au jour correspondant à la date actuelle
+            const todayCard = document.getElementById(`day-${todayFormatted}`);
+
+            if (todayCard) {
+                todayCard.classList.add('highlight-today');
+                // Optionnel: Faire défiler la page jusqu'au jour actuel
+                todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Appelle les fonctions au chargement de la page
+        window.onload = function() {
+            displaySimulatedWeather();
+            startCountdown(); // Démarre le compte à rebours
+            updateDayHighlight(); // Met en évidence le jour actuel
+            // Ensure day1 starts collapsed by NOT calling toggleDay('day1') here.
+            // The 'hidden' class is already applied in the HTML by default.
+        };
+    </script>
+</body>
+</html>
