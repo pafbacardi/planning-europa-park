@@ -350,34 +350,9 @@
                 </div>
                 <div id="packingListItems" class="text-gray-800">
                     <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
-                    <!-- Exemples d'articles pré-remplis -->
-                    <div class="packing-list-item">
-                        <input type="checkbox" id="item1">
-                        <label for="item1">Passeports / Cartes d'identité</label>
-                        <button class="delete-btn" data-item-id="item1">Supprimer</button>
-                    </div>
-                    <div class="packing-list-item">
-                        <input type="checkbox" id="item2">
-                        <label for="item2">Billets (train/avion/parcs)</label>
-                        <button class="delete-btn" data-item-id="item2">Supprimer</button>
-                    </div>
-                    <div class="packing-list-item">
-                        <input type="checkbox" id="item3">
-                        <label for="item3">Chargeurs de téléphone</label>
-                        <button class="delete-btn" data-item-id="item3">Supprimer</button>
-                    </div>
-                    <div class="packing-list-item">
-                        <input type="checkbox" id="item4">
-                        <label for="item4">Maillots de bain et serviettes</label>
-                        <button class="delete-btn" data-item-id="item4">Supprimer</button>
-                    </div>
-                    <div class="packing-list-item">
-                        <input type="checkbox" id="item5">
-                        <label for="item5">Trousse de premiers secours</label>
-                        <button class="delete-btn" data-item-id="item5">Supprimer</button>
-                    </div>
                 </div>
                 <p class="text-xs text-gray-500 mt-2">Cochez les articles une fois qu'ils sont emballés. Vous pouvez ajouter ou supprimer des articles.</p>
+                <div class="text-xs text-gray-500 mt-2">Votre ID utilisateur pour cette session : <span id="userIdDisplay" class="font-bold">Chargement...</span></div>
             </div>
         </div>
 
@@ -532,9 +507,65 @@
 
     </div>
 
-    <script>
+    <script type="module">
+        // Import des modules Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variables globales pour Firebase
+        let db;
+        let auth;
+        let currentUserId = 'loading...'; // Initialisation temporaire
+        let appId; // Variable pour l'ID de l'application
+
+        // Initialisation de Firebase
+        async function initializeFirebase() {
+            // Récupération de l'ID de l'application depuis l'environnement Canvas
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing. Cannot initialize Firebase.");
+                document.getElementById('userIdDisplay').textContent = 'Erreur: Firebase non configuré';
+                return;
+            }
+
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Authentification anonyme
+            try {
+                // Utilise __initial_auth_token si disponible, sinon signe anonymement
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Erreur d'authentification Firebase :", error);
+                document.getElementById('userIdDisplay').textContent = 'Erreur d\'authentification';
+            }
+
+            // Écoute les changements d'état d'authentification
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    document.getElementById('userIdDisplay').textContent = currentUserId;
+                    // Une fois authentifié, charge la liste de colisage
+                    loadPackingList();
+                } else {
+                    currentUserId = 'anonymous';
+                    document.getElementById('userIdDisplay').textContent = 'Anonyme';
+                    // Si déconnecté, vide la liste pour éviter d'afficher des données non pertinentes
+                    packingListItems.innerHTML = '';
+                }
+            });
+        }
+
+
         // JavaScript function to toggle the visibility of day content
-        // This function needs to be globally accessible because it's called directly from HTML onclick attributes.
         window.toggleDay = function(dayId) {
             const content = document.getElementById(`content-${dayId}`);
             const arrow = document.getElementById(`arrow-${dayId}`);
@@ -665,35 +696,46 @@
             }
         }
 
-        // --- Logique de la Liste de Colisage ---
+        // --- Logique de la Liste de Colisage avec Firestore ---
         const newItemInput = document.getElementById('newItemInput');
         const addItemButton = document.getElementById('addItemButton');
         const packingListItems = document.getElementById('packingListItems');
 
-        // Fonction pour créer un nouvel élément de liste
-        function createPackingListItem(text, isChecked = false) {
-            const itemId = `item-${Date.now()}`; // ID unique pour l'élément
-
+        // Fonction pour créer un nouvel élément de liste (DOM)
+        function createPackingListItemElement(id, text, isChecked = false) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'packing-list-item';
-            itemDiv.setAttribute('data-item-id', itemId); // Pour faciliter la suppression
+            itemDiv.setAttribute('data-doc-id', id); // Stocke l'ID du document Firestore
 
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.id = itemId;
+            checkbox.id = `checkbox-${id}`; // ID unique pour la checkbox
             checkbox.checked = isChecked;
-            checkbox.addEventListener('change', savePackingList); // Sauvegarder l'état au changement
+            checkbox.addEventListener('change', async () => {
+                // Met à jour l'état dans Firestore
+                if (db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
+                    const itemRef = doc(db, `artifacts/${appId}/public/data/packingList`, id);
+                    await updateDoc(itemRef, { checked: checkbox.checked });
+                } else {
+                    console.warn("Firestore non initialisé ou utilisateur non authentifié pour la mise à jour.");
+                }
+            });
 
             const label = document.createElement('label');
-            label.htmlFor = itemId;
+            label.htmlFor = `checkbox-${id}`;
             label.textContent = text;
 
             const deleteButton = document.createElement('button');
             deleteButton.className = 'delete-btn';
             deleteButton.textContent = 'Supprimer';
-            deleteButton.addEventListener('click', () => {
-                itemDiv.remove(); // Supprime l'élément du DOM
-                savePackingList(); // Sauvegarde la liste après suppression
+            deleteButton.addEventListener('click', async () => {
+                // Supprime l'élément de Firestore
+                if (db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
+                    const itemRef = doc(db, `artifacts/${appId}/public/data/packingList`, id);
+                    await deleteDoc(itemRef);
+                } else {
+                    console.warn("Firestore non initialisé ou utilisateur non authentifié pour la suppression.");
+                }
             });
 
             itemDiv.appendChild(checkbox);
@@ -703,38 +745,48 @@
             return itemDiv;
         }
 
-        // Fonction pour charger la liste de colisage depuis le stockage local
+        // Fonction pour charger et écouter la liste de colisage depuis Firestore
         function loadPackingList() {
-            const savedList = localStorage.getItem('packingList');
-            if (savedList) {
-                const items = JSON.parse(savedList);
-                items.forEach(item => {
-                    packingListItems.appendChild(createPackingListItem(item.text, item.checked));
-                });
+            if (!db || currentUserId === 'loading...' || currentUserId === 'anonymous') {
+                console.log("En attente de l'initialisation de Firebase ou de l'authentification de l'utilisateur pour charger la liste de colisage.");
+                return;
             }
-        }
 
-        // Fonction pour sauvegarder la liste de colisage dans le stockage local
-        function savePackingList() {
-            const itemsToSave = [];
-            packingListItems.querySelectorAll('.packing-list-item').forEach(itemDiv => {
-                const checkbox = itemDiv.querySelector('input[type="checkbox"]');
-                const label = itemDiv.querySelector('label');
-                itemsToSave.push({
-                    text: label.textContent,
-                    checked: checkbox.checked
+            // Chemin de la collection publique pour la liste de colisage
+            const packingListCollectionRef = collection(db, `artifacts/${appId}/public/data/packingList`);
+
+            // Écoute en temps réel les changements
+            onSnapshot(packingListCollectionRef, (snapshot) => {
+                packingListItems.innerHTML = ''; // Vide la liste actuelle
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    packingListItems.appendChild(createPackingListItemElement(doc.id, item.text, item.checked));
                 });
+            }, (error) => {
+                console.error("Erreur lors de l'écoute de la liste de colisage :", error);
+                packingListItems.innerHTML = '<p class="text-red-500">Erreur de chargement de la liste. Veuillez réessayer.</p>';
             });
-            localStorage.setItem('packingList', JSON.stringify(itemsToSave));
         }
 
-        // Gérer l'ajout d'un nouvel article
-        addItemButton.addEventListener('click', () => {
+        // Gérer l'ajout d'un nouvel article à Firestore
+        addItemButton.addEventListener('click', async () => {
             const itemText = newItemInput.value.trim();
-            if (itemText) {
-                packingListItems.appendChild(createPackingListItem(itemText));
-                newItemInput.value = ''; // Effacer l'input
-                savePackingList(); // Sauvegarder la nouvelle liste
+            if (itemText && db && currentUserId !== 'loading...' && currentUserId !== 'anonymous') {
+                try {
+                    // Ajoute un nouveau document à la collection
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/packingList`), {
+                        text: itemText,
+                        checked: false,
+                        createdAt: new Date() // Ajoute un timestamp pour un éventuel tri
+                    });
+                    newItemInput.value = ''; // Effacer l'input
+                } catch (e) {
+                    console.error("Erreur lors de l'ajout du document : ", e);
+                }
+            } else if (!itemText) {
+                console.warn("Le texte de l'article ne peut pas être vide.");
+            } else {
+                console.warn("Firestore non initialisé ou utilisateur non authentifié pour l'ajout.");
             }
         });
 
@@ -746,13 +798,12 @@
         });
 
         // Appelle les fonctions au chargement de la page
-        window.onload = function() {
+        window.onload = async function() {
             displaySimulatedWeather();
             startCountdown(); // Démarre le compte à rebours
             updateDayHighlight(); // Met en évidence le jour actuel
-            loadPackingList(); // Charge la liste de colisage
-            // Ensure day1 starts collapsed by NOT calling toggleDay('day1') here.
-            // The 'hidden' class is already applied in the HTML by default.
+            await initializeFirebase(); // Initialise Firebase et l'authentification
+            // loadPackingList() est appelée après l'authentification réussie dans initializeFirebase
         };
     </script>
 </body>
