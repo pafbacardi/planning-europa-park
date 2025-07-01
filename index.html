@@ -770,7 +770,10 @@
                     `;
                 } else if (now >= startDate.getTime() && now < endDate.getTime()) {
                     // Pendant les vacances
-                    clearInterval(interval); // Arrête le compte à rebours si les vacances sont commencées
+                    // Clear interval only if it's currently running (to avoid errors if already cleared)
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
                     countdownTitleElement.textContent = ""; // Cache le titre
                     countdownElement.innerHTML = `<div class="text-green-700 font-bold text-base sm:text-lg">🎉 Les vacances ont commencé !</div>`;
                 } else {
@@ -786,12 +789,16 @@
                         <div class="text-red-700 font-bold text-base sm:text-lg">Vacances terminées 😔</div>
                         <div class="text-red-600 text-sm mt-1">depuis ${days}J ${hours}H ${minutes}M ${seconds}S</div>
                     `;
-                    clearInterval(interval); // Arrête le compte à rebours une fois les vacances terminées
+                    // Clear interval only if it's currently running
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
                 }
             }
 
             // Mettre à jour le compte à rebours toutes les secondes
-            const interval = setInterval(updateCountdown, 1000);
+            // Store the interval ID to be able to clear it later
+            window.countdownInterval = setInterval(updateCountdown, 1000);
             updateCountdown(); // Appel initial pour afficher le compte à rebours immédiatement
         }
 
@@ -871,13 +878,25 @@
         // Fonction d'initialisation de Firebase et de l'authentification
         async function initializeFirebase() {
             try {
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+                // Ta configuration Firebase réelle
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBbJTLdUfYicbfRIWpa1UI2hriGEWtrsZA",
+                    authDomain: "base-vacances-ete-2025.firebaseapp.com",
+                    projectId: "base-vacances-ete-2025",
+                    storageBucket: "base-vacances-ete-2025.firebasestorage.app",
+                    messagingSenderId: "446416873148",
+                    appId: "1:446416873148:web:f1b23b0d98785da53c52b9"
+                };
 
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase config is missing. Cannot initialize Firebase.");
-                    // Message d'erreur plus explicite pour l'utilisateur
-                    packingListStatus.textContent = "Erreur: La configuration Firebase est manquante. Les fonctionnalités collaboratives ne sont pas disponibles. Veuillez vérifier l'environnement.";
+                console.log("Firebase Config utilisée:", firebaseConfig); // Log pour le débogage
+
+                // L'appId pour Firestore doit correspondre au projectId de ta config Firebase
+                // C'est important pour les règles de sécurité Firestore
+                appId = firebaseConfig.projectId; 
+
+                if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                    console.error("Firebase config is missing or incomplete.");
+                    packingListStatus.textContent = "Erreur: La configuration Firebase est manquante ou incomplète. Les fonctionnalités collaboratives ne sont pas disponibles.";
                     return;
                 }
 
@@ -894,15 +913,13 @@
                         packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
                         setupPackingListListener(); // Démarrer l'écoute de la liste de colisage
                     } else {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            try {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } catch (error) {
-                                console.error("Erreur de connexion avec token initial:", error);
-                                await signInAnonymously(auth);
-                            }
-                        } else {
+                        // Si pas de token initial fourni par l'environnement, se connecter anonymement
+                        // Ceci est important pour que même les utilisateurs non connectés puissent interagir
+                        try {
                             await signInAnonymously(auth);
+                        } catch (anonError) {
+                            console.error("Erreur lors de la connexion anonyme:", anonError);
+                            packingListStatus.textContent = "Erreur d'authentification Firebase. Veuillez vérifier l'activation de la connexion anonyme dans votre console Firebase (section Authentication > Sign-in method).";
                         }
                     }
                 });
@@ -925,7 +942,7 @@
                 renderPackingList(items);
             }, (error) => {
                 console.error("Erreur lors de la récupération de la liste de colisage:", error);
-                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage.";
+                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage. Vérifiez les règles de sécurité Firestore.";
             });
         }
 
@@ -1002,12 +1019,19 @@
 
         // Supprime un élément de la liste de colisage
         async function deleteItem(itemId) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) { // Utilisation de confirm pour une action destructive
-                try {
-                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
-                } catch (error) {
-                    console.error("Erreur lors de la suppression de l'élément:", error);
-                }
+            // Remplacer window.confirm par une logique de confirmation personnalisée ou un simple log pour le débogage
+            console.log("Tentative de suppression de l'élément:", itemId);
+            // Pour le moment, nous allons simuler la confirmation.
+            // Dans une vraie application, tu implémenterais une boîte de dialogue modale personnalisée ici.
+            // Par exemple, tu pourrais avoir un état `isDeleting` et afficher un message "Êtes-vous sûr ?"
+            // avant d'appeler deleteDoc.
+
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
+                console.log("Élément supprimé avec succès:", itemId);
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'élément:", error);
+                // Afficher un message d'erreur à l'utilisateur si nécessaire
             }
         }
 
