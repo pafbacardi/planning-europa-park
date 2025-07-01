@@ -361,7 +361,7 @@
                     </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://www.vinci-autoroutes.com/static/81d12a3bf141348d9b425be379bbf420/cathedrale-strasbourg-idee-sortie-vinci-autoroutes.jpg" alt="Autre image de Strasbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://www.vinci-autoroutes.com/static/81d12a3bf141348d9b425be379bbf420/cathedrale-strasbourg-idee-sortie-vinci-autoroutes.jpg" alt="Image de Strasbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
             </div>
@@ -876,7 +876,8 @@
 
                 if (Object.keys(firebaseConfig).length === 0) {
                     console.error("Firebase config is missing. Cannot initialize Firebase.");
-                    packingListStatus.textContent = "Erreur: Configuration Firebase manquante.";
+                    // Message d'erreur plus explicite pour l'utilisateur
+                    packingListStatus.textContent = "Erreur: La configuration Firebase est manquante. Les fonctionnalités collaboratives ne sont pas disponibles. Veuillez vérifier l'environnement.";
                     return;
                 }
 
@@ -908,7 +909,7 @@
 
             } catch (error) {
                 console.error("Erreur lors de l'initialisation de Firebase:", error);
-                packingListStatus.textContent = "Erreur: Impossible d'initialiser Firebase.";
+                packingListStatus.textContent = "Erreur: Impossible d'initialiser Firebase. Vérifiez votre connexion ou la configuration.";
             }
         }
 
