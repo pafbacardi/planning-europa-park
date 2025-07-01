@@ -108,33 +108,33 @@
             text-align: center;
         }
 
-        /* Styles pour la liste de colisage */
-        .packing-list-item {
+        /* Styles pour la liste de colisage et la gestion des événements */
+        .list-item-container {
             display: flex;
             align-items: center;
             padding: 0.5rem 0;
             border-bottom: 1px solid #e5e7eb; /* Gray-200 */
         }
-        .packing-list-item:last-child {
+        .list-item-container:last-child {
             border-bottom: none;
         }
-        .packing-list-item input[type="checkbox"] {
+        .list-item-container input[type="checkbox"] {
             margin-right: 0.75rem;
             width: 1.25rem;
             height: 1.25rem;
             accent-color: #3b82f6; /* Blue-500 */
         }
-        .packing-list-item label {
+        .list-item-container label, .list-item-container span {
             flex-grow: 1;
             font-size: 1rem;
             color: #374151; /* Gray-700 */
             cursor: pointer;
         }
-        .packing-list-item input[type="checkbox"]:checked + label {
+        .list-item-container input[type="checkbox"]:checked + label {
             text-decoration: line-through;
             color: #6b7280; /* Gray-500 */
         }
-        .packing-list-item .delete-btn {
+        .list-item-container .delete-btn {
             background-color: #ef4444; /* Red-500 */
             color: white;
             padding: 0.25rem 0.6rem;
@@ -144,17 +144,17 @@
             transition: background-color 0.2s;
             margin-left: 0.5rem;
         }
-        .packing-list-item .delete-btn:hover {
+        .list-item-container .delete-btn:hover {
             background-color: #dc2626; /* Red-600 */
         }
-        .add-item-input {
+        .add-input {
             border: 1px solid #d1d5db; /* Gray-300 */
             border-radius: 0.375rem;
             padding: 0.5rem 0.75rem;
             flex-grow: 1;
             margin-right: 0.5rem;
         }
-        .add-item-btn {
+        .add-btn {
             background-color: #22c55e; /* Green-500 */
             color: white;
             padding: 0.5rem 1rem;
@@ -162,7 +162,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .add-item-btn:hover {
+        .add-btn:hover {
             background-color: #16a34a; /* Green-600 */
         }
     </style>
@@ -574,14 +574,14 @@
             </div>
             <div id="content-packing-list" class="p-4 hidden">
                 <div class="mb-4 flex items-center">
-                    <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="add-item-input">
-                    <button id="unlockButton" class="add-item-btn bg-blue-500 hover:bg-blue-700">Déverrouiller</button>
+                    <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="add-input">
+                    <button id="unlockButton" class="add-btn bg-blue-500 hover:bg-blue-700">Déverrouiller</button>
                 </div>
                 <p id="passwordMessage" class="text-sm text-red-600 mb-2 hidden">Mot de passe incorrect.</p>
 
                 <div class="mb-4 flex" id="packingListControls">
-                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-item-input" disabled>
-                    <button id="addItemButton" class="add-item-btn" disabled>Ajouter</button>
+                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-input" disabled>
+                    <button id="addItemButton" class="add-btn" disabled>Ajouter</button>
                 </div>
                 <div id="packingListItems" class="text-gray-800">
                     <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
@@ -592,12 +592,46 @@
             </div>
         </div>
 
+        <!-- Nouvelle Section: Gestion des Événements -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('event-management')">
+                <h2 class="text-2xl sm:text-3xl font-bold">📅 Gestion des Événements</h2>
+                <span id="arrow-event-management" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-event-management" class="p-4 hidden">
+                <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="eventDateInput" class="block text-gray-700 text-sm font-bold mb-2 text-left">Jour :</label>
+                        <input type="date" id="eventDateInput" class="add-input w-full" disabled>
+                    </div>
+                    <div>
+                        <label for="eventSubjectInput" class="block text-gray-700 text-sm font-bold mb-2 text-left">Objet de l'événement :</label>
+                        <input type="text" id="eventSubjectInput" placeholder="Ex: Visite du musée" class="add-input w-full" disabled>
+                    </div>
+                    <div>
+                        <label for="eventStartTimeInput" class="block text-gray-700 text-sm font-bold mb-2 text-left">Heure de début :</label>
+                        <input type="time" id="eventStartTimeInput" class="add-input w-full" disabled>
+                    </div>
+                    <div>
+                        <label for="eventEndTimeInput" class="block text-gray-700 text-sm font-bold mb-2 text-left">Heure de fin :</label>
+                        <input type="time" id="eventEndTimeInput" class="add-input w-full" disabled>
+                    </div>
+                </div>
+                <button id="addEventButton" class="add-btn w-full mt-4" disabled>Ajouter l'événement</button>
+                <div id="eventsListItems" class="text-gray-800 mt-4">
+                    <!-- Les événements seront ajoutés ici par JavaScript -->
+                    <p class="text-center text-gray-500 p-4" id="eventsListStatus">Chargement des événements...</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Ajoutez, modifiez ou supprimez des événements pour votre planning.</p>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURATION OPENWEATHERMAP ---
@@ -830,42 +864,64 @@
             }
         }
 
-        // --- Logique de la Liste de Colisage (avec Firestore et protection par mot de passe) ---
+        // --- Logique de la Liste de Colisage et Gestion des Événements (avec Firestore et protection par mot de passe) ---
         let db;
         let auth;
         let userId = 'Chargement...'; // Initialisation temporaire
         let appId; // Déclarer appId ici pour qu'il soit accessible dans le module
         let packingListColRef;
+        let eventsListColRef; // Nouvelle référence de collection pour les événements
 
         const passwordInput = document.getElementById('passwordInput');
         const unlockButton = document.getElementById('unlockButton');
         const passwordMessage = document.getElementById('passwordMessage');
-        const packingListControls = document.getElementById('packingListControls');
+
+        // Packing List elements
         const newItemInput = document.getElementById('newItemInput');
         const addItemButton = document.getElementById('addItemButton');
         const packingListItems = document.getElementById('packingListItems');
         const packingListStatus = document.getElementById('packingListStatus');
+        
+        // Event Management elements
+        const eventDateInput = document.getElementById('eventDateInput');
+        const eventSubjectInput = document.getElementById('eventSubjectInput');
+        const eventStartTimeInput = document.getElementById('eventStartTimeInput');
+        const eventEndTimeInput = document.getElementById('eventEndTimeInput');
+        const addEventButton = document.getElementById('addEventButton');
+        const eventsListItems = document.getElementById('eventsListItems');
+        const eventsListStatus = document.getElementById('eventsListStatus');
+
         const userIdDisplay = document.getElementById('userIdDisplay');
 
         const UNLOCK_PASSWORD = "EP2025"; // Le mot de passe pour déverrouiller la modification
 
-        // Fonction pour activer/désactiver les contrôles de la liste de colisage
-        function enablePackingListEdit(enabled) {
+        // Fonction pour activer/désactiver les contrôles
+        function enableControls(enabled) {
+            // Packing List controls
             newItemInput.disabled = !enabled;
             addItemButton.disabled = !enabled;
-            // Activer/désactiver les boutons de suppression sur les éléments existants
             packingListItems.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.disabled = !enabled;
             });
             packingListItems.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 checkbox.disabled = !enabled;
             });
+
+            // Event Management controls
+            eventDateInput.disabled = !enabled;
+            eventSubjectInput.disabled = !enabled;
+            eventStartTimeInput.disabled = !enabled;
+            eventEndTimeInput.disabled = !enabled;
+            addEventButton.disabled = !enabled;
+            eventsListItems.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.disabled = !enabled;
+            });
         }
 
         // Gestionnaire pour le bouton de déverrouillage
         unlockButton.addEventListener('click', () => {
             if (passwordInput.value === UNLOCK_PASSWORD) {
-                enablePackingListEdit(true);
+                enableControls(true);
                 passwordInput.classList.add('hidden'); // Cache l'input du mot de passe
                 unlockButton.classList.add('hidden'); // Cache le bouton de déverrouillage
                 passwordMessage.classList.add('hidden'); // Cache le message d'erreur
@@ -897,6 +953,7 @@
                 if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
                     console.error("Firebase config is missing or incomplete.");
                     packingListStatus.textContent = "Erreur: La configuration Firebase est manquante ou incomplète. Les fonctionnalités collaboratives ne sont pas disponibles.";
+                    eventsListStatus.textContent = "Erreur: La configuration Firebase est manquante ou incomplète. Les fonctionnalités collaboratives ne sont pas disponibles.";
                     return;
                 }
 
@@ -911,15 +968,17 @@
                         userIdDisplay.textContent = userId;
                         console.log("Utilisateur connecté:", userId);
                         packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
+                        eventsListColRef = collection(db, `artifacts/${appId}/public/data/eventsList`); // Nouvelle collection pour les événements
                         setupPackingListListener(); // Démarrer l'écoute de la liste de colisage
+                        setupEventsListener(); // Démarrer l'écoute des événements
                     } else {
                         // Si pas de token initial fourni par l'environnement, se connecter anonymement
-                        // Ceci est important pour que même les utilisateurs non connectés puissent interagir
                         try {
                             await signInAnonymously(auth);
                         } catch (anonError) {
                             console.error("Erreur lors de la connexion anonyme:", anonError);
                             packingListStatus.textContent = "Erreur d'authentification Firebase. Veuillez vérifier l'activation de la connexion anonyme dans votre console Firebase (section Authentication > Sign-in method).";
+                            eventsListStatus.textContent = "Erreur d'authentification Firebase. Veuillez vérifier l'activation de la connexion anonyme dans votre console Firebase (section Authentication > Sign-in method).";
                         }
                     }
                 });
@@ -927,12 +986,14 @@
             } catch (error) {
                 console.error("Erreur lors de l'initialisation de Firebase:", error);
                 packingListStatus.textContent = "Erreur: Impossible d'initialiser Firebase. Vérifiez votre connexion ou la configuration.";
+                eventsListStatus.textContent = "Erreur: Impossible d'initialiser Firebase. Vérifiez votre connexion ou la configuration.";
             }
         }
 
+        // --- Packing List Functions ---
+
         // Configure l'écouteur en temps réel pour la liste de colisage
         function setupPackingListListener() {
-            // Utilisation de orderBy pour trier par createdAt, ce qui est recommandé pour les listes
             const q = query(packingListColRef, orderBy('createdAt'));
             onSnapshot(q, (snapshot) => {
                 const items = [];
@@ -940,9 +1001,13 @@
                     items.push({ id: doc.id, ...doc.data() });
                 });
                 renderPackingList(items);
+                // Après le rendu initial, si le mot de passe est déjà entré, réactiver les contrôles
+                if (passwordInput.classList.contains('hidden')) {
+                    enableControls(true);
+                }
             }, (error) => {
                 console.error("Erreur lors de la récupération de la liste de colisage:", error);
-                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage. Vérifiez les règles de sécurité Firestore.";
+                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage. Vérifiez les règles de sécurité Firestore et l'index 'createdAt'.";
             });
         }
 
@@ -956,7 +1021,7 @@
 
             items.forEach(item => {
                 const itemDiv = document.createElement('div');
-                itemDiv.className = `packing-list-item ${item.checked ? 'checked' : ''} bg-white hover:bg-gray-50`;
+                itemDiv.className = `list-item-container bg-white hover:bg-gray-50`;
                 itemDiv.dataset.id = item.id; // Stocke l'ID du document Firestore
 
                 const checkbox = document.createElement('input');
@@ -964,17 +1029,22 @@
                 checkbox.id = `item-${item.id}`; // Utilise l'ID Firestore pour l'ID HTML
                 checkbox.checked = item.checked;
                 checkbox.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
-                checkbox.addEventListener('change', () => toggleItem(item.id, item.checked));
+                checkbox.addEventListener('change', () => togglePackingItem(item.id, item.checked));
 
                 const label = document.createElement('label');
                 label.htmlFor = `item-${item.id}`;
                 label.textContent = item.text;
+                if (item.checked) {
+                    label.classList.add('line-through', 'text-gray-500');
+                } else {
+                    label.classList.remove('line-through', 'text-gray-500');
+                }
 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-btn';
                 deleteButton.textContent = 'Supprimer';
                 deleteButton.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
-                deleteButton.addEventListener('click', () => deleteItem(item.id));
+                deleteButton.addEventListener('click', () => deletePackingItem(item.id));
 
                 itemDiv.appendChild(checkbox);
                 itemDiv.appendChild(label);
@@ -986,10 +1056,10 @@
         }
 
         // Ajoute un nouvel élément à la liste de colisage
-        async function addItem() {
+        async function addPackingItem() {
             const newItemText = newItemInput.value.trim();
             if (newItemText === '') {
-                console.warn("Le champ ne peut pas être vide.");
+                console.warn("Le champ de la liste de colisage ne peut pas être vide.");
                 return;
             }
 
@@ -1002,46 +1072,139 @@
                 });
                 newItemInput.value = ''; // Vide l'input après ajout
             } catch (error) {
-                console.error("Erreur lors de l'ajout de l'élément:", error);
+                console.error("Erreur lors de l'ajout de l'élément de colisage:", error);
             }
         }
 
         // Bascule l'état coché/décoché d'un élément de la liste de colisage
-        async function toggleItem(itemId, currentCheckedStatus) {
+        async function togglePackingItem(itemId, currentCheckedStatus) {
             try {
                 await updateDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId), {
                     checked: !currentCheckedStatus
                 });
             } catch (error) {
-                console.error("Erreur lors de la mise à jour de l'élément:", error);
+                console.error("Erreur lors de la mise à jour de l'élément de colisage:", error);
             }
         }
 
         // Supprime un élément de la liste de colisage
-        async function deleteItem(itemId) {
-            // Remplacer window.confirm par une logique de confirmation personnalisée ou un simple log pour le débogage
-            console.log("Tentative de suppression de l'élément:", itemId);
-            // Pour le moment, nous allons simuler la confirmation.
-            // Dans une vraie application, tu implémenterais une boîte de dialogue modale personnalisée ici.
-            // Par exemple, tu pourrais avoir un état `isDeleting` et afficher un message "Êtes-vous sûr ?"
-            // avant d'appeler deleteDoc.
-
+        async function deletePackingItem(itemId) {
+            console.log("Tentative de suppression de l'élément de colisage:", itemId);
             try {
                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
-                console.log("Élément supprimé avec succès:", itemId);
+                console.log("Élément de colisage supprimé avec succès:", itemId);
             } catch (error) {
-                console.error("Erreur lors de la suppression de l'élément:", error);
-                // Afficher un message d'erreur à l'utilisateur si nécessaire
+                console.error("Erreur lors de la suppression de l'élément de colisage:", error);
             }
         }
 
         // Événements pour ajouter un élément à la liste de colisage
-        addItemButton.addEventListener('click', addItem);
+        addItemButton.addEventListener('click', addPackingItem);
         newItemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !newItemInput.disabled) {
-                addItem();
+                addPackingItem();
             }
         });
+
+        // --- Event Management Functions ---
+
+        // Configure l'écouteur en temps réel pour la liste des événements
+        function setupEventsListener() {
+            // Tri par jour puis par heure de début
+            const q = query(eventsListColRef, orderBy('day'), orderBy('startTime'));
+            onSnapshot(q, (snapshot) => {
+                const events = [];
+                snapshot.forEach((doc) => {
+                    events.push({ id: doc.id, ...doc.data() });
+                });
+                renderEvents(events);
+                if (passwordInput.classList.contains('hidden')) {
+                    enableControls(true);
+                }
+            }, (error) => {
+                console.error("Erreur lors de la récupération de la liste des événements:", error);
+                eventsListStatus.textContent = "Erreur: Impossible de charger la liste des événements. Vérifiez les règles de sécurité Firestore et les index 'day' et 'startTime'.";
+            });
+        }
+
+        // Rend la liste des événements dans l'interface utilisateur
+        function renderEvents(events) {
+            eventsListItems.innerHTML = ''; // Vide le conteneur existant
+            if (events.length === 0) {
+                eventsListItems.innerHTML = '<p class="text-center text-gray-500 p-4">Aucun événement planifié. Ajoutez-en !</p>';
+                return;
+            }
+
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `list-item-container flex-col items-start bg-white hover:bg-gray-50`; // flex-col for better layout
+                eventDiv.dataset.id = event.id;
+
+                eventDiv.innerHTML = `
+                    <div class="flex justify-between items-center w-full mb-1">
+                        <span class="font-semibold text-blue-700">${event.day}</span>
+                        <button class="delete-btn" data-id="${event.id}">Supprimer</button>
+                    </div>
+                    <div class="text-gray-800 text-left w-full pl-4">
+                        <span class="font-medium">${event.startTime} - ${event.endTime} : </span>
+                        <span>${event.subject}</span>
+                    </div>
+                `;
+                // Re-enable delete button if controls are enabled
+                const deleteButton = eventDiv.querySelector('.delete-btn');
+                deleteButton.disabled = eventDateInput.disabled;
+                deleteButton.addEventListener('click', () => deleteEvent(event.id));
+
+                eventsListItems.appendChild(eventDiv);
+            });
+            eventsListStatus.textContent = '';
+        }
+
+        // Ajoute un nouvel événement
+        async function addEvent() {
+            const day = eventDateInput.value;
+            const subject = eventSubjectInput.value.trim();
+            const startTime = eventStartTimeInput.value;
+            const endTime = eventEndTimeInput.value;
+
+            if (!day || !subject || !startTime || !endTime) {
+                console.warn("Tous les champs de l'événement doivent être remplis.");
+                // Optionnel: Afficher un message d'erreur à l'utilisateur
+                return;
+            }
+
+            try {
+                await addDoc(eventsListColRef, {
+                    day: day,
+                    subject: subject,
+                    startTime: startTime,
+                    endTime: endTime,
+                    createdAt: serverTimestamp(),
+                    createdBy: userId
+                });
+                // Clear inputs after successful add
+                eventDateInput.value = '';
+                eventSubjectInput.value = '';
+                eventStartTimeInput.value = '';
+                eventEndTimeInput.value = '';
+            } catch (error) {
+                console.error("Erreur lors de l'ajout de l'événement:", error);
+            }
+        }
+
+        // Supprime un événement
+        async function deleteEvent(eventId) {
+            console.log("Tentative de suppression de l'événement:", eventId);
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/eventsList`, eventId));
+                console.log("Événement supprimé avec succès:", eventId);
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'événement:", error);
+            }
+        }
+
+        // Événement pour ajouter un événement
+        addEventButton.addEventListener('click', addEvent);
 
         // Appelle les fonctions au chargement de la page
         window.onload = function() {
@@ -1049,7 +1212,7 @@
             updateDayHighlight(); // Met en évidence le jour actuel
             loadAllWeather(); // Charge la météo
             initializeFirebase(); // Initialise Firebase et toutes les fonctionnalités Firestore
-            enablePackingListEdit(false); // Désactive les contrôles par défaut
+            enableControls(false); // Désactive les contrôles par défaut pour les deux sections
         };
     </script>
 </body>
