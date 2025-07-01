@@ -107,6 +107,64 @@
             padding: 2rem;
             text-align: center;
         }
+
+        /* Styles pour la liste de colisage */
+        .packing-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+        }
+        .packing-list-item:last-child {
+            border-bottom: none;
+        }
+        .packing-list-item input[type="checkbox"] {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: #3b82f6; /* Blue-500 */
+        }
+        .packing-list-item label {
+            flex-grow: 1;
+            font-size: 1rem;
+            color: #374151; /* Gray-700 */
+            cursor: pointer;
+        }
+        .packing-list-item input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #6b7280; /* Gray-500 */
+        }
+        .packing-list-item .delete-btn {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-left: 0.5rem;
+        }
+        .packing-list-item .delete-btn:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        .add-item-input {
+            border: 1px solid #d1d5db; /* Gray-300 */
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+        .add-item-btn {
+            background-color: #22c55e; /* Green-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .add-item-btn:hover {
+            background-color: #16a34a; /* Green-600 */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
@@ -278,6 +336,51 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Section: Liste de Colisage -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('packing-list')">
+                <h2 class="text-2xl sm:text-3xl font-bold">🎒 Liste de Colisage</h2>
+                <span id="arrow-packing-list" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-packing-list" class="p-4 hidden">
+                <div class="mb-4 flex">
+                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-item-input">
+                    <button id="addItemButton" class="add-item-btn">Ajouter</button>
+                </div>
+                <div id="packingListItems" class="text-gray-800">
+                    <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
+                    <!-- Exemples d'articles pré-remplis -->
+                    <div class="packing-list-item">
+                        <input type="checkbox" id="item1">
+                        <label for="item1">Passeports / Cartes d'identité</label>
+                        <button class="delete-btn" data-item-id="item1">Supprimer</button>
+                    </div>
+                    <div class="packing-list-item">
+                        <input type="checkbox" id="item2">
+                        <label for="item2">Billets (train/avion/parcs)</label>
+                        <button class="delete-btn" data-item-id="item2">Supprimer</button>
+                    </div>
+                    <div class="packing-list-item">
+                        <input type="checkbox" id="item3">
+                        <label for="item3">Chargeurs de téléphone</label>
+                        <button class="delete-btn" data-item-id="item3">Supprimer</button>
+                    </div>
+                    <div class="packing-list-item">
+                        <input type="checkbox" id="item4">
+                        <label for="item4">Maillots de bain et serviettes</label>
+                        <button class="delete-btn" data-item-id="item4">Supprimer</button>
+                    </div>
+                    <div class="packing-list-item">
+                        <input type="checkbox" id="item5">
+                        <label for="item5">Trousse de premiers secours</label>
+                        <button class="delete-btn" data-item-id="item5">Supprimer</button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Cochez les articles une fois qu'ils sont emballés. Vous pouvez ajouter ou supprimer des articles.</p>
+            </div>
+        </div>
+
 
         <!-- Résumé des Trajets et Temps de Route Estimés -->
         <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
@@ -562,11 +665,92 @@
             }
         }
 
+        // --- Logique de la Liste de Colisage ---
+        const newItemInput = document.getElementById('newItemInput');
+        const addItemButton = document.getElementById('addItemButton');
+        const packingListItems = document.getElementById('packingListItems');
+
+        // Fonction pour créer un nouvel élément de liste
+        function createPackingListItem(text, isChecked = false) {
+            const itemId = `item-${Date.now()}`; // ID unique pour l'élément
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'packing-list-item';
+            itemDiv.setAttribute('data-item-id', itemId); // Pour faciliter la suppression
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = itemId;
+            checkbox.checked = isChecked;
+            checkbox.addEventListener('change', savePackingList); // Sauvegarder l'état au changement
+
+            const label = document.createElement('label');
+            label.htmlFor = itemId;
+            label.textContent = text;
+
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-btn';
+            deleteButton.textContent = 'Supprimer';
+            deleteButton.addEventListener('click', () => {
+                itemDiv.remove(); // Supprime l'élément du DOM
+                savePackingList(); // Sauvegarde la liste après suppression
+            });
+
+            itemDiv.appendChild(checkbox);
+            itemDiv.appendChild(label);
+            itemDiv.appendChild(deleteButton);
+
+            return itemDiv;
+        }
+
+        // Fonction pour charger la liste de colisage depuis le stockage local
+        function loadPackingList() {
+            const savedList = localStorage.getItem('packingList');
+            if (savedList) {
+                const items = JSON.parse(savedList);
+                items.forEach(item => {
+                    packingListItems.appendChild(createPackingListItem(item.text, item.checked));
+                });
+            }
+        }
+
+        // Fonction pour sauvegarder la liste de colisage dans le stockage local
+        function savePackingList() {
+            const itemsToSave = [];
+            packingListItems.querySelectorAll('.packing-list-item').forEach(itemDiv => {
+                const checkbox = itemDiv.querySelector('input[type="checkbox"]');
+                const label = itemDiv.querySelector('label');
+                itemsToSave.push({
+                    text: label.textContent,
+                    checked: checkbox.checked
+                });
+            });
+            localStorage.setItem('packingList', JSON.stringify(itemsToSave));
+        }
+
+        // Gérer l'ajout d'un nouvel article
+        addItemButton.addEventListener('click', () => {
+            const itemText = newItemInput.value.trim();
+            if (itemText) {
+                packingListItems.appendChild(createPackingListItem(itemText));
+                newItemInput.value = ''; // Effacer l'input
+                savePackingList(); // Sauvegarder la nouvelle liste
+            }
+        });
+
+        // Permettre l'ajout avec la touche Entrée
+        newItemInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                addItemButton.click(); // Simule un clic sur le bouton Ajouter
+            }
+        });
+
         // Appelle les fonctions au chargement de la page
         window.onload = function() {
             displaySimulatedWeather();
             startCountdown(); // Démarre le compte à rebours
             updateDayHighlight(); // Met en évidence le jour actuel
+            loadPackingList(); // Charge la liste de colisage
             // Ensure day1 starts collapsed by NOT calling toggleDay('day1') here.
             // The 'hidden' class is already applied in the HTML by default.
         };
