@@ -135,6 +135,9 @@
             font-weight: 700;
             color: #1e40af;
             margin-bottom: 1rem;
+            display: flex; /* Added for speaker icon alignment */
+            align-items: center; /* Added for speaker icon alignment */
+            justify-content: space-between; /* Added for speaker icon alignment */
         }
         .planning-item {
             display: flex;
@@ -374,6 +377,23 @@
             pointer-events: auto;
             opacity: 1;
         }
+        .speaker-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: white;
+            margin-left: 0.5rem;
+            padding: 0;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        .speaker-button:hover {
+            transform: scale(1.1);
+        }
+        .speaker-button.speaking {
+            color: #fcd34d; /* Yellow-300 */
+        }
     </style>
 </head>
 <body class="p-2 sm:p-4 md:p-8">
@@ -403,7 +423,10 @@
         <!-- Jour 1 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-20">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day1')">
-                <h3 class="text-xl font-semibold">🏡 Jour 1 (Dimanche 20 juillet) : De Charvieu-Chavagneux à Colmar</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🏡 Jour 1 (Dimanche 20 juillet) : De Charvieu-Chavagneux à Colmar</span>
+                    <button class="speaker-button" data-day-date="2025-07-20" onclick="event.stopPropagation(); speakDaySummary('2025-07-20', this)">🔊</button>
+                </h3>
                 <span id="arrow-day1" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day1" class="p-4 hidden">
@@ -424,7 +447,10 @@
         <!-- Jour 2 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-21">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day2')">
-                <h3 class="text-xl font-semibold">🏰 Jour 2 (Lundi 21 juillet) : De Colmar au Château du Haut-Kœnigsbourg et Arrivée à Europa-Park</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🏰 Jour 2 (Lundi 21 juillet) : De Colmar au Château du Haut-Kœnigsbourg et Arrivée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-21" onclick="event.stopPropagation(); speakDaySummary('2025-07-21', this)">🔊</button>
+                </h3>
                 <span id="arrow-day2" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day2" class="p-4 hidden">
@@ -450,7 +476,10 @@
         <!-- Jour 3 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-22">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day3')">
-                <h3 class="text-xl font-semibold">🎡 Jour 3 (Mardi 22 juillet) : Journée à Europa-Park</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 3 (Mardi 22 juillet) : Journée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-22" onclick="event.stopPropagation(); speakDaySummary('2025-07-22', this)">🔊</button>
+                </h3>
                 <span id="arrow-day3" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day3" class="p-4 hidden">
@@ -471,7 +500,10 @@
         <!-- Jour 4 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-23">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day4')">
-                <h3 class="text-xl font-semibold">🎡 Jour 4 (Mercredi 23 juillet) : Journée à Europa-Park</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 4 (Mercredi 23 juillet) : Journée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-23" onclick="event.stopPropagation(); speakDaySummary('2025-07-23', this)">🔊</button>
+                </h3>
                 <span id="arrow-day4" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day4" class="p-4 hidden">
@@ -492,7 +524,10 @@
         <!-- Jour 5 (Rulantica) -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-24">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day5')">
-                <h3 class="text-xl font-semibold">🌊 Jour 5 (Jeudi 24 juillet) : Journée à Rulantica</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🌊 Jour 5 (Jeudi 24 juillet) : Journée à Rulantica</span>
+                    <button class="speaker-button" data-day-date="2025-07-24" onclick="event.stopPropagation(); speakDaySummary('2025-07-24', this)">🔊</button>
+                </h3>
                 <span id="arrow-day5" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day5" class="p-4 hidden">
@@ -513,7 +548,10 @@
         <!-- Jour 6 (Europa-Park et Retour) -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-25">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day6')">
-                <h3 class="text-xl font-semibold">🎡 Jour 6 (Vendredi 25 juillet) : Europa-Park et départ vers Strasbourg</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 6 (Vendredi 25 juillet) : Europa-Park et départ vers Strasbourg</span>
+                    <button class="speaker-button" data-day-date="2025-07-25" onclick="event.stopPropagation(); speakDaySummary('2025-07-25', this)">🔊</button>
+                </h3>
                 <span id="arrow-day6" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day6" class="p-4 hidden">
@@ -539,7 +577,10 @@
         <!-- Jour 7 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-26">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day7')">
-                <h3 class="text-xl font-semibold">🏛️ Jour 7 (Samedi 26 juillet) : Journée complète à Strasbourg</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🏛️ Jour 7 (Samedi 26 juillet) : Journée complète à Strasbourg</span>
+                    <button class="speaker-button" data-day-date="2025-07-26" onclick="event.stopPropagation(); speakDaySummary('2025-07-26', this)">🔊</button>
+                </h3>
                 <span id="arrow-day7" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day7" class="p-4 hidden">
@@ -560,7 +601,10 @@
         <!-- Jour 8 -->
         <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-27">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day8')">
-                <h3 class="text-xl font-semibold">🏞️ Jour 8 (Dimanche 27 juillet) : De Lingolsheim (Strasbourg) via Salins-les-Bains à Charvieu-Chavagneux</h3>
+                <h3 class="text-xl font-semibold">
+                    <span>🏞️ Jour 8 (Dimanche 27 juillet) : De Lingolsheim (Strasbourg) via Salins-les-Bains à Charvieu-Chavagneux</span>
+                    <button class="speaker-button" data-day-date="2025-07-27" onclick="event.stopPropagation(); speakDaySummary('2025-07-27', this)">🔊</button>
+                </h3>
                 <span id="arrow-day8" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-day8" class="p-4 hidden">
@@ -833,7 +877,6 @@
         const unlockButton = document.getElementById('unlockButton');
         const relockButton = document.getElementById('relockButton');
         const passwordMessage = document.getElementById('passwordMessage');
-        // Removed offlineIndicator as per user request
 
         let db;
         let auth;
@@ -842,8 +885,9 @@
         let packingListColRef;
         let eventsColRef;
 
-        // Removed Service Worker Registration as per user request
-        // Removed Online/Offline Status Listener as per user request
+        // --- Speech Synthesis Variables ---
+        let currentUtterance = null; // To keep track of the current speech
+        let isSpeaking = false;
 
         // --- Countdown Logic ---
         const vacationStartDate = new Date('2025-07-20T09:30:00');
@@ -912,11 +956,8 @@
 
         // --- Météo en temps réel via OpenWeatherMap ---
         const weatherDisplay = document.getElementById('weatherDisplay');
-        // Removed weatherOfflineMessage as per user request
 
         async function fetchWeatherData(city) {
-            // Removed navigator.onLine check as per user request
-
             const currentWeatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
             const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
 
@@ -996,8 +1037,6 @@
         }
 
         async function loadAllWeather() {
-            // Removed navigator.onLine check and weatherOfflineMessage logic as per user request
-
             const cities = [
                 { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
                 { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' },
@@ -1166,58 +1205,58 @@
         // Initial static planning data (from the original HTML, now used for initial DB population)
         const initialPlanningData = {
             '2025-07-20': [
-                { startTime: '09:30', endTime: '09:30', subject: '🚗 Départ de Charvieu-Chavagneux' },
-                { startTime: '09:30', endTime: '11:30', subject: '🛣️ Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)' },
-                { startTime: '11:30', endTime: '12:30', subject: '🥪 Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.' },
-                { startTime: '12:30', endTime: '14:30', subject: '🛣️ Reprise du Trajet vers Colmar (environ 2h de route)' },
-                { startTime: '14:30', endTime: '15:00', subject: '🛎️ Arrivée à Colmar et Check-in à l\'Hôtel Primo' },
-                { startTime: '15:00', endTime: '17:00', subject: '🧸 Visite du Musée du Jouet de Colmar', link: 'https://www.youtube.com/watch?v=your_colmar_toy_museum_video' },
-                { startTime: '17:00', endTime: '19:00', subject: '🚶‍♀️ Balade dans la Petite Venise et le centre historique' },
-                { startTime: '19:00', endTime: '21:00', subject: '🍽️ Dîner à Colmar' },
-                { startTime: '21:00', endTime: '23:00', subject: '😴 Retour à l\'hôtel et Nuit' },
+                { startTime: '09:30', endTime: '09:30', subject: 'Départ de Charvieu-Chavagneux' },
+                { startTime: '09:30', endTime: '11:30', subject: 'Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)' },
+                { startTime: '11:30', endTime: '12:30', subject: 'Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.' },
+                { startTime: '12:30', endTime: '14:30', subject: 'Reprise du Trajet vers Colmar (environ 2h de route)' },
+                { startTime: '14:30', endTime: '15:00', subject: 'Arrivée à Colmar et Check-in à l\'Hôtel Primo' },
+                { startTime: '15:00', endTime: '17:00', subject: 'Visite du Musée du Jouet de Colmar', link: 'https://www.youtube.com/watch?v=your_colmar_toy_museum_video' },
+                { startTime: '17:00', endTime: '19:00', subject: 'Balade dans la Petite Venise et le centre historique' },
+                { startTime: '19:00', endTime: '21:00', subject: 'Dîner à Colmar' },
+                { startTime: '21:00', endTime: '23:00', subject: 'Retour à l\'hôtel et Nuit' },
             ],
             '2025-07-21': [
-                { startTime: '09:00', endTime: '10:00', subject: '☕ Lever et Petit-déjeuner à l\'Hôtel Primo Colmar, puis check-out.' },
-                { startTime: '10:00', endTime: '10:40', subject: '🛣️ Route de Colmar au Château du Haut-Kœnigsbourg (environ 40 min de route)' },
-                { startTime: '10:40', endTime: '12:40', subject: '⚔️ Visite du Château du Haut-Kœnigsbourg (environ 2 heures)', link: 'https://www.youtube.com/watch?v=f2wN64j-O7c' },
-                { startTime: '12:40', endTime: '13:40', subject: '🍔 Déjeuner (Pique-nique ou restauration rapide/simple)' },
-                { startTime: '13:40', endTime: '14:40', subject: '🎢 Route du Château du Haut-Kœnigsbourg à Europa-Park (Rust) (environ 1h de route)' },
-                { startTime: '15:30', endTime: '15:30', subject: '🛎️ Arrivée à l\'hôtel El Andaluz et Check-in' },
-                { startTime: '17:00', endTime: '23:00', subject: '🌙 Installation et Détente à l\'hôtel El Andaluz. Dîner et nuit sur place.' },
+                { startTime: '09:00', endTime: '10:00', subject: 'Lever et Petit-déjeuner à l\'Hôtel Primo Colmar, puis check-out.' },
+                { startTime: '10:00', endTime: '10:40', subject: 'Route de Colmar au Château du Haut-Kœnigsbourg (environ 40 min de route)' },
+                { startTime: '10:40', endTime: '12:40', subject: 'Visite du Château du Haut-Kœnigsbourg (environ 2 heures)', link: 'https://www.youtube.com/watch?v=f2wN64j-O7c' },
+                { startTime: '12:40', endTime: '13:40', subject: 'Déjeuner (Pique-nique ou restauration rapide/simple)' },
+                { startTime: '13:40', endTime: '14:40', subject: 'Route du Château du Haut-Kœnigsbourg à Europa-Park (Rust) (environ 1h de route)' },
+                { startTime: '15:30', endTime: '15:30', subject: 'Arrivée à l\'hôtel El Andaluz et Check-in' },
+                { startTime: '17:00', endTime: '23:00', subject: 'Installation et Détente à l\'hôtel El Andaluz. Dîner et nuit sur place.' },
             ],
             '2025-07-22': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎉 Journée complète à Europa-Park. Profitez des attractions et spectacles !', link: 'https://www.youtube.com/watch?v=your_europapark_video' }
+                { startTime: '09:00', endTime: '22:00', subject: 'Journée complète à Europa-Park. Profitez des attractions et spectacles !', link: 'https://www.youtube.com/watch?v=your_europapark_video' }
             ],
             '2025-07-23': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎢 Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.', link: 'https://www.youtube.com/watch?v=your_europapark_video_2' }
+                { startTime: '09:00', endTime: '22:00', subject: 'Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.', link: 'https://www.youtube.com/watch?v=your_europapark_video_2' }
             ],
             '2025-07-24': [
-                { startTime: '10:00', endTime: '19:00', subject: '🏊‍♀️ Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.', link: 'https://www.youtube.com/watch?v=your_rulantica_video' }
+                { startTime: '10:00', endTime: '19:00', subject: 'Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.', link: 'https://www.youtube.com/watch?v=your_rulantica_video' }
             ],
             '2025-07-25': [
-                { startTime: '09:00', endTime: '15:00', subject: '✨ Dernière matinée à Europa-Park. Profitez des attractions favorites.', link: 'https://www.youtube.com/watch?v=your_europapark_video_3' },
-                { startTime: '15:00', endTime: '16:00', subject: '🛣️ Départ d\'Europa-Park vers Lingolsheim (environ 50 min - 1h de route).' },
-                { startTime: '16:00', endTime: '22:00', subject: '🛌 Arrivée et installation à l\'Hôtel Campanile Strasbourg - Lingolsheim. Dîner et première nuit sur place.' }
+                { startTime: '09:00', endTime: '15:00', subject: 'Dernière matinée à Europa-Park. Profitez des attractions favorites.', link: 'https://www.youtube.com/watch?v=your_europapark_video_3' },
+                { startTime: '15:00', endTime: '16:00', subject: 'Départ d\'Europa-Park vers Lingolsheim (environ 50 min - 1h de route).' },
+                { startTime: '16:00', endTime: '22:00', subject: 'Arrivée et installation à l\'Hôtel Campanile Strasbourg - Lingolsheim. Dîner et première nuit sur place.' }
             ],
             '2025-07-26': [
-                { startTime: '08:30', endTime: '09:30', subject: '🥐 Lever et Petit-déjeuner à l\'hôtel.' },
-                { startTime: '09:30', endTime: '10:00', subject: '🚌 Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min).' },
-                { startTime: '10:00', endTime: '12:00', subject: '⛪ Visite de la Cathédrale Notre-Dame de Strasbourg.', link: 'https://www.youtube.com/watch?v=your_strasbourg_cathedral_video' },
-                { startTime: '12:00', endTime: '14:00', subject: '🍔 Déjeuner (Pique-nique ou boulangerie/sandwicherie).' },
-                { startTime: '14:00', endTime: '15:30', subject: '🛥️ Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).', link: 'https://www.youtube.com/watch?v=your_batorama_video' },
-                { startTime: '15:30', endTime: '17:30', subject: '🏘️ Balade dans la Petite France et les Ponts Couverts.' },
-                { startTime: '17:30', endTime: '18:30', subject: '🌳 Détente au Parc de l\'Orangerie (optionnel).' },
-                { startTime: '19:00', endTime: '21:00', subject: '🍕 Dîner à Strasbourg.' },
-                { startTime: '21:00', endTime: '23:00', subject: '😴 Retour à l\'hôtel et Nuit.' }
+                { startTime: '08:30', endTime: '09:30', subject: 'Lever et Petit-déjeuner à l\'hôtel.' },
+                { startTime: '09:30', endTime: '10:00', subject: 'Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min).' },
+                { startTime: '10:00', endTime: '12:00', subject: 'Visite de la Cathédrale Notre-Dame de Strasbourg.', link: 'https://www.youtube.com/watch?v=your_strasbourg_cathedral_video' },
+                { startTime: '12:00', endTime: '14:00', subject: 'Déjeuner (Pique-nique ou boulangerie/sandwicherie).' },
+                { startTime: '14:00', endTime: '15:30', subject: 'Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).', link: 'https://www.youtube.com/watch?v=your_batorama_video' },
+                { startTime: '15:30', endTime: '17:30', subject: 'Balade dans la Petite France et les Ponts Couverts.' },
+                { startTime: '17:30', endTime: '18:30', subject: 'Détente au Parc de l\'Orangerie (optionnel).' },
+                { startTime: '19:00', endTime: '21:00', subject: 'Dîner à Strasbourg.' },
+                { startTime: '21:00', endTime: '23:00', subject: 'Retour à l\'hôtel et Nuit.' }
             ],
             '2025-07-27': [
-                { startTime: '08:00', endTime: '09:00', subject: '☕ Lever et Petit-déjeuner à l\'hôtel.' },
-                { startTime: '09:00', endTime: '09:30', subject: '🎒 Préparation et Check-out de l\'hôtel.' },
-                { startTime: '09:30', endTime: '13:00', subject: '🛣️ Trajet de Lingolsheim à Salins-les-Bains (environ 3h30 de route).' },
-                { startTime: '13:00', endTime: '14:00', subject: '🍽️ Déjeuner à Salins-les-Bains.' },
-                { startTime: '14:00', endTime: '16:00', subject: '🧂 Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).', link: 'https://www.youtube.com/watch?v=your_salines_video' },
-                { startTime: '16:00', endTime: '18:00', subject: '🚗 Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).' },
-                { startTime: '18:00', endTime: '18:00', subject: '🏠 Arrivée à votre domicile. Fin des vacances !' }
+                { startTime: '08:00', endTime: '09:00', subject: 'Lever et Petit-déjeuner à l\'hôtel.' },
+                { startTime: '09:00', endTime: '09:30', subject: 'Préparation et Check-out de l\'hôtel.' },
+                { startTime: '09:30', endTime: '13:00', subject: 'Trajet de Lingolsheim à Salins-les-Bains (environ 3h30 de route).' },
+                { startTime: '13:00', endTime: '14:00', subject: 'Déjeuner à Salins-les-Bains.' },
+                { startTime: '14:00', endTime: '16:00', subject: 'Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).', link: 'https://www.youtube.com/watch?v=your_salines_video' },
+                { startTime: '16:00', endTime: '18:00', subject: 'Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).' },
+                { startTime: '18:00', endTime: '18:00', subject: 'Arrivée à votre domicile. Fin des vacances !' }
             ]
         };
 
@@ -1660,7 +1699,8 @@
                 });
                 newItemInput.value = '';
                 console.log("Élément de colisage ajouté:", newItemText);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error("Erreur lors de l'ajout de l'élément:", error);
                 // Remplacer alert par une boîte de dialogue personnalisée
             }
@@ -1689,6 +1729,153 @@
                 // Remplacer alert par une boîte de dialogue personnalisée
             }
         }
+
+        // --- Speech Synthesis (Text-to-Speech) Logic ---
+
+        // Function to build the summary text for a given day
+        function buildDaySummaryText(dayDate, events) {
+            let summary = `Voici le programme détaillé pour le ${new Date(dayDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}. `;
+
+            if (events.length === 0) {
+                summary += "Il n'y a pas d'événements planifiés pour cette journée.";
+                return summary;
+            }
+
+            events.forEach((event, index) => {
+                let eventText = '';
+                if (event.startTime) {
+                    eventText += `À ${event.startTime}`;
+                    if (event.endTime && event.startTime !== event.endTime) {
+                        eventText += ` et jusqu'à ${event.endTime}`;
+                    }
+                    eventText += `, `;
+                }
+                eventText += `${event.subject}. `;
+                
+                // Add more descriptive sentences for key events/places
+                if (dayDate === '2025-07-20') {
+                    if (event.subject.includes('Départ de Charvieu-Chavagneux')) {
+                        eventText += "Votre grande aventure commence !";
+                    } else if (event.subject.includes('Musée du Jouet de Colmar')) {
+                        eventText += "Plongez dans le monde merveilleux des jeux et des jouets, un régal pour petits et grands.";
+                    } else if (event.subject.includes('Petite Venise')) {
+                        eventText += "Profitez d'une balade charmante dans les ruelles pittoresques de Colmar, un véritable enchantement.";
+                    }
+                } else if (dayDate === '2025-07-21') {
+                    if (event.subject.includes('Château du Haut-Kœnigsbourg')) {
+                        eventText += "Découvrez cette forteresse médiévale impressionnante, perchée sur la montagne, offrant des vues spectaculaires.";
+                    } else if (event.subject.includes('Europa-Park')) {
+                        eventText += "Bienvenue à Europa-Park, l'un des meilleurs parcs d'attractions au monde !";
+                    }
+                } else if (dayDate === '2025-07-22' || dayDate === '2025-07-23' || dayDate === '2025-07-25') {
+                    if (event.subject.includes('Europa-Park')) {
+                        eventText += "Préparez-vous à une journée pleine d'adrénaline et de magie avec des attractions pour tous les âges et des spectacles grandioses.";
+                    }
+                } else if (dayDate === '2025-07-24') {
+                    if (event.subject.includes('Rulantica')) {
+                        eventText += "Une journée de folie aquatique vous attend à Rulantica, avec des toboggans palpitants et des piscines relaxantes.";
+                    }
+                } else if (dayDate === '2025-07-26') {
+                    if (event.subject.includes('Cathédrale Notre-Dame de Strasbourg')) {
+                        eventText += "Admirez la grandeur de cette cathédrale emblématique, un chef-d'œuvre de l'architecture gothique.";
+                    } else if (event.subject.includes('Bateau-Mouche Batorama')) {
+                        eventText += "Détendez-vous lors d'une croisière commentée pour découvrir Strasbourg sous un autre angle.";
+                    } else if (event.subject.includes('Petite France')) {
+                        eventText += "Flânez dans le quartier historique de la Petite France, avec ses charmantes maisons à colombages et ses canaux pittoresques.";
+                    }
+                } else if (dayDate === '2025-07-27') {
+                    if (event.subject.includes('Grandes Salines de Salins-les-Bains')) {
+                        eventText += "Explorez ce site historique unique, classé au patrimoine mondial de l'UNESCO, et découvrez l'histoire du sel.";
+                    } else if (event.subject.includes('Arrivée à votre domicile')) {
+                        eventText += "Vos merveilleuses vacances se terminent ici. Nous espérons que vous avez fait le plein de souvenirs !";
+                    }
+                }
+                summary += eventText;
+            });
+
+            return summary;
+        }
+
+        // Function to speak the summary
+        window.speakDaySummary = function(dayDate, buttonElement) {
+            if (!('speechSynthesis' in window)) {
+                console.error("La synthèse vocale n'est pas supportée par ce navigateur.");
+                alert("Votre navigateur ne supporte pas la synthèse vocale."); // Fallback alert
+                return;
+            }
+
+            // Check if speech is currently active
+            if (isSpeaking) {
+                // If the same button was clicked AND it's the current utterance, stop it.
+                if (currentUtterance && currentUtterance.dayDate === dayDate) {
+                    window.speechSynthesis.cancel();
+                    isSpeaking = false;
+                    buttonElement.classList.remove('speaking'); // Remove highlight from this button
+                    currentUtterance = null; // Clear the reference
+                    console.log(`Lecture arrêtée pour le jour ${dayDate}.`);
+                    return; // Exit, as the request was to stop
+                } else {
+                    // If a different button was clicked, cancel current speech before starting new one
+                    window.speechSynthesis.cancel();
+                    isSpeaking = false;
+                    // Remove 'speaking' class from ALL buttons, as the previous one is now stopped
+                    document.querySelectorAll('.speaker-button').forEach(btn => btn.classList.remove('speaking'));
+                    currentUtterance = null; // Clear the reference
+                    console.log("Lecture précédente arrêtée.");
+                }
+            }
+
+            // Get events for the day
+            const dayEvents = initialPlanningData[dayDate];
+            if (!dayEvents) {
+                console.warn(`Aucun événement trouvé pour le jour ${dayDate}.`);
+                return;
+            }
+
+            const textToSpeak = buildDaySummaryText(dayDate, dayEvents);
+            currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+            currentUtterance.lang = 'fr-FR'; // Set language to French
+            currentUtterance.dayDate = dayDate; // Store dayDate on the utterance for comparison
+
+            // Find a French voice if available
+            const voices = window.speechSynthesis.getVoices();
+            const frenchVoice = voices.find(voice => voice.lang === 'fr-FR' || voice.lang === 'fr_FR');
+            if (frenchVoice) {
+                currentUtterance.voice = frenchVoice;
+            } else {
+                console.warn("Voix française non trouvée, utilisant la voix par défaut.");
+            }
+
+            currentUtterance.onstart = () => {
+                isSpeaking = true;
+                buttonElement.classList.add('speaking');
+                console.log(`Début de la lecture pour le jour ${dayDate}.`);
+            };
+
+            currentUtterance.onend = () => {
+                isSpeaking = false;
+                buttonElement.classList.remove('speaking');
+                currentUtterance = null;
+                console.log(`Fin de la lecture pour le jour ${dayDate}.`);
+            };
+
+            currentUtterance.onerror = (event) => {
+                isSpeaking = false;
+                buttonElement.classList.remove('speaking');
+                currentUtterance = null;
+                console.error('Erreur de synthèse vocale:', event.error);
+                alert(`Erreur lors de la lecture du planning: ${event.error}`); // Fallback alert
+            };
+
+            window.speechSynthesis.speak(currentUtterance);
+        };
+
+        // Ensure voices are loaded before trying to set a specific voice
+        window.speechSynthesis.onvoiceschanged = () => {
+            // This event fires when voices are loaded.
+            // No action needed here, as speakDaySummary will fetch voices when called.
+        };
+
 
         // --- Event Listeners ---
         window.toggleDay = function(dayId) {
