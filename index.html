@@ -17,8 +17,21 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f2f5; /* Fond gris clair pour le body */
-            padding: 1rem;
+            /* Padding ajusté pour mieux utiliser la largeur sur mobile */
+            padding: 0.5rem; /* p-2 equivalent */
         }
+        /* Tailwind responsive classes will override this for larger screens */
+        @media (min-width: 640px) { /* sm */
+            body {
+                padding: 1rem; /* p-4 equivalent */
+            }
+        }
+        @media (min-width: 768px) { /* md */
+            body {
+                padding: 2rem; /* p-8 equivalent */
+            }
+        }
+
         .rotated {
             transform: rotate(180deg);
         }
@@ -105,7 +118,7 @@
             color: #333;
             border-radius: 0.75rem;
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
+            /* Padding sera géré par les classes Tailwind directement sur la div */
             /* text-align: center; -- REMOVED THIS LINE */
         }
 
@@ -186,7 +199,7 @@
         /* Password Controls */
         .password-controls {
             display: flex;
-            flex-wrap: wrap; /* ADDED THIS LINE */
+            flex-wrap: wrap;
             margin-bottom: 1.5rem;
             gap: 0.5rem;
         }
@@ -363,9 +376,9 @@
         }
     </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
+<body class="p-2 sm:p-4 md:p-8">
 
-    <div class="main-container max-w-4xl mx-auto subtle-pattern">
+    <div class="main-container max-w-4xl mx-auto subtle-pattern p-4 md:p-8">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-8">
             ✈️ Programme des Vacances été 2025 👨‍👩‍👧‍👦
         </h1>
@@ -1374,7 +1387,7 @@
 
         async function deletePlanningItem(dayDate, idToDelete) {
             // Remplacé confirm par un log console
-            console.log(`Tentative de suppression de l'événement ${idToDelete} pour le jour ${dayDate}.`);
+            console.log(`Confirmation de suppression de l'événement ${idToDelete} pour le jour ${dayDate}.`);
             try {
                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/events`, idToDelete));
                 console.log("Événement supprimé avec succès:", idToDelete);
