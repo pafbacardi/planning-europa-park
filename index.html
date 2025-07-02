@@ -131,12 +131,17 @@
             transition: background-color 0.2s;
             padding: 0.25rem 0;
             cursor: default; /* Default to not clickable */
-            pointer-events: none; /* Default to not clickable */
+            pointer-events: none; /* Default to not clickable for editing */
+        }
+        /* Override for links within planning items to always be clickable */
+        .planning-item a {
+            pointer-events: auto; /* Allow clicks on links inside planning items */
+            cursor: pointer; /* Ensure link cursor is a pointer */
         }
         .planning-item.unlocked:hover { /* Only hover effect when unlocked */
             background-color: #e2e8f0;
         }
-        .planning-item.unlocked { /* Only clickable when unlocked */
+        .planning-item.unlocked { /* Only clickable for editing when unlocked */
             cursor: pointer;
             pointer-events: auto;
         }
@@ -181,6 +186,7 @@
         /* Password Controls */
         .password-controls {
             display: flex;
+            flex-wrap: wrap; /* ADDED THIS LINE */
             margin-bottom: 1.5rem;
             gap: 0.5rem;
         }
@@ -189,14 +195,19 @@
             padding: 0.5rem 0.75rem;
             border: 1px solid #d1d5db;
             border-radius: 0.375rem;
+            min-width: 150px; /* Ensure input doesn't shrink too much */
         }
-        .password-unlock-btn {
-            background-color: #3b82f6;
-            color: white;
+        .password-unlock-btn, .password-relock-btn { /* Apply styles to both buttons */
+            flex-shrink: 0; /* Prevent buttons from shrinking */
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
             cursor: pointer;
             transition: background-color 0.2s;
+            white-space: nowrap; /* Prevent button text from wrapping */
+        }
+        .password-unlock-btn {
+            background-color: #3b82f6;
+            color: white;
         }
         .password-unlock-btn:hover {
             background-color: #2563eb;
@@ -204,10 +215,6 @@
         .password-relock-btn {
             background-color: #6b7280;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
             display: none; /* Hidden by default */
         }
         .password-relock-btn:hover {
@@ -822,7 +829,6 @@
         let eventsColRef;
 
         // --- Countdown Logic ---
-        const countdownDisplay = document.getElementById('countdown');
         const vacationStartDate = new Date('2025-07-20T09:30:00');
         const vacationEndDate = new Date('2025-07-27T18:00:00');
 
@@ -1089,6 +1095,7 @@
 
                 planningItems.forEach(item => {
                     item.classList.toggle('unlocked', enabled); // Add/remove 'unlocked' class for CSS
+                    // Only apply pointer-events: none to the item itself for editing, not its children links
                     item.style.pointerEvents = enabled ? 'auto' : 'none';
                     item.style.cursor = enabled ? 'pointer' : 'default';
                 });
@@ -1306,7 +1313,11 @@
                     deletePlanningItem(dayDate, item.id);
                 });
 
-                itemDiv.addEventListener('click', () => {
+                itemDiv.addEventListener('click', (e) => { // Added event parameter
+                    // Prevent editing when clicking on a link
+                    if (e.target.tagName === 'A') {
+                        return;
+                    }
                     if (unlockButton.classList.contains('hidden')) {
                         editPlanningItem(dayDate, item.id);
                     } else {
