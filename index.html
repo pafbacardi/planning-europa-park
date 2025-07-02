@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,21 +9,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Définition du motif SVG pour le fond du CONTENEUR PRINCIPAL */
+        /* Un motif de cercles, couleur bleue très très claire, opacité 0.15 */
         .subtle-pattern {
             background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23e0f2f7' fill-opacity='0.15'/%3E%3C/svg%3E");
             background-repeat: repeat;
-            background-attachment: scroll;
+            background-attachment: scroll; /* Le motif défile avec le contenu du conteneur */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Fond gris clair pour le body */
-            padding: 1rem;
+            background-color: #f0f2f5; /* Fond gris clair pour le body (pas de motif ici) */
         }
         .rotated {
             transform: rotate(180deg);
         }
-
         /* Styles pour le compte à rebours - Plus discret et sur une seule ligne */
         .countdown-container {
             background-color: #f8fafc; /* Very light blue/almost white */
@@ -109,184 +109,6 @@
             text-align: center;
         }
 
-        /* Styles pour le planning et les événements */
-        .day-section {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .day-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 1rem;
-        }
-        .planning-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-            color: #374151;
-            transition: background-color 0.2s;
-            padding: 0.25rem 0;
-            cursor: default; /* Default to not clickable */
-            pointer-events: none; /* Default to not clickable */
-        }
-        .planning-item.unlocked:hover { /* Only hover effect when unlocked */
-            background-color: #e2e8f0;
-        }
-        .planning-item.unlocked { /* Only clickable when unlocked */
-            cursor: pointer;
-            pointer-events: auto;
-        }
-        .planning-item .time {
-            font-weight: 600;
-            min-width: 80px;
-        }
-        .planning-item .delete-btn {
-            background-color: #ef4444;
-            color: white;
-            padding: 0.15rem 0.4rem;
-            border-radius: 0.25rem;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-left: 0.5rem;
-            display: none; /* Hidden by default */
-        }
-        .planning-item .delete-btn:hover {
-            background-color: #dc2626;
-        }
-        .add-event-plus-btn {
-            background-color: #10b981;
-            color: white;
-            border-radius: 9999px;
-            width: 48px;
-            height: 48px;
-            font-size: 2rem;
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, transform 0.2s;
-            margin: 1.5rem auto 0.5rem auto;
-        }
-        .add-event-plus-btn:hover {
-            background-color: #059669;
-            transform: scale(1.05);
-        }
-
-        /* Password Controls */
-        .password-controls {
-            display: flex;
-            margin-bottom: 1.5rem;
-            gap: 0.5rem;
-        }
-        .password-input {
-            flex-grow: 1;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-        }
-        .password-unlock-btn {
-            background-color: #3b82f6;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .password-unlock-btn:hover {
-            background-color: #2563eb;
-        }
-        .password-relock-btn {
-            background-color: #6b7280;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: none; /* Hidden by default */
-        }
-        .password-relock-btn:hover {
-            background-color: #4b5563;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background-color: #ffffff;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            transform: translateY(-20px);
-            transition: transform 0.3s ease;
-            position: relative;
-        }
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-        }
-        .modal-close-btn:hover {
-            color: #374151;
-        }
-        .modal-form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-        @media (min-width: 640px) {
-            .modal-form-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        .modal-form-grid label {
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.25rem;
-            display: block;
-            font-size: 0.875rem;
-        }
-        .modal-form-grid input {
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            padding: 0.5rem 0.75rem;
-            width: 100%;
-        }
-
         /* Styles pour la liste de colisage */
         .packing-list-item {
             display: flex;
@@ -322,7 +144,6 @@
             cursor: pointer;
             transition: background-color 0.2s;
             margin-left: 0.5rem;
-            display: none; /* Hidden by default */
         }
         .packing-list-item .delete-btn:hover {
             background-color: #dc2626; /* Red-600 */
@@ -345,15 +166,6 @@
         .add-item-btn:hover {
             background-color: #16a34a; /* Green-600 */
         }
-        /* Controls for packing list add/edit */
-        #packingListAddControls input, #packingListAddControls button {
-            pointer-events: none; /* Disabled by default */
-            opacity: 0.6;
-        }
-        #packingListAddControls.unlocked input, #packingListAddControls.unlocked button {
-            pointer-events: auto;
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
@@ -375,21 +187,13 @@
             </div>
         </div>
 
-        <!-- Password Unlock Section -->
-        <div class="password-controls">
-            <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="password-input">
-            <button id="unlockButton" class="password-unlock-btn">Déverrouiller</button>
-            <button id="relockButton" class="password-relock-btn">Re-verrouiller</button>
-        </div>
-        <p id="passwordMessage" class="text-sm text-red-600 mb-4 hidden">Mot de passe incorrect.</p>
-
         <!-- Phase 1: Aller en Alsace et Arrivée à Europa-Park -->
         <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2">
             🗺️ Phase 1 : L'aller en Alsace et Arrivée à Europa-Park
         </h2>
 
         <!-- Jour 1 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-20">
+        <div id="day-2025-07-20" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day1')">
                 <h3 class="text-xl font-semibold">🏡 Jour 1 (Dimanche 20 juillet) : De Charvieu-Chavagneux à Colmar</h3>
                 <span id="arrow-day1" class="transform transition-transform duration-300">▼</span>
@@ -397,20 +201,27 @@
             <div id="content-day1" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-20" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li><span class="font-semibold">09h30 :</span> 🚗 Départ de Charvieu-Chavagneux</li>
+                        <li><span class="font-semibold">09h30 - 11h30 :</span> 🛣️ Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)</li>
+                        <li><span class="font-semibold">11h30 - 12h30 :</span> 🥪 Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.</li>
+                        <li><span class="font-semibold">12h30 - 14h30 :</span> 🛣️ Reprise du Trajet vers Colmar (environ 2h de route)</li>
+                        <li><span class="font-semibold">14h30 - 15h00 :</span> 🛎️ Arrivée à Colmar et Check-in à l'<a href="https://hotel-primo.fr/" target="_blank" class="text-blue-600 hover:underline">Hôtel Primo</a></li>
+                        <li><span class="font-semibold">15h00 - 17h00 :</span> 🧸 Visite du <a href="https://www.tripadvisor.fr/Attraction_Review-g187073-d3202017-Reviews-Musee_du_Jouet-Colmar_Haut_Rhin_Grand_Est.html" target="_blank" class="text-blue-600 hover:underline">Musée du Jouet de Colmar</a></li>
+                        <li><span class="font-semibold">17h00 - 19h00 :</span> 🚶‍♀️ Balade dans la Petite Venise et le centre historique</li>
+                        <li><span class="font-semibold">19h00 :</span> 🍽️ Dîner à Colmar</li>
+                        <li><span class="font-semibold">21h00 :</span> 😴 Retour à l'hôtel et Nuit</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://www.civitatis.com/f/francia/colmar/pass-alsace-589x392.jpg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://www.civitatis.com/f/francia/colmar/pass-alsace-589x392.jpg" alt="Image de Colmar" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-20" disabled>+</button>
             </div>
         </div>
 
         <!-- Jour 2 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-21">
+        <div id="day-2025-07-21" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day2')">
                 <h3 class="text-xl font-semibold">🏰 Jour 2 (Lundi 21 juillet) : De Colmar au Château du Haut-Kœnigsbourg et Arrivée à Europa-Park</h3>
                 <span id="arrow-day2" class="transform transition-transform duration-300">▼</span>
@@ -418,15 +229,20 @@
             <div id="content-day2" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-21" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li><span class="font-semibold">09h00 - 10h00 :</span> ☕ Lever et Petit-déjeuner à l'Hôtel Primo Colmar, puis check-out.</li>
+                        <li><span class="font-semibold">10h00 - 10h40 :</span> 🛣️ Route de Colmar au <a href="https://www.youtube.com/watch?v=eL08tOY_gwk" target="_blank" class="text-blue-600 hover:underline">Château du Haut-Kœnigsbourg</a> (environ 40 min de route)</li>
+                        <li><span class="font-semibold">10h40 - 12h40 :</span> ⚔️ Visite du <a href="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/2b/14/6c/vue-aerienne-du-chateau.jpg?w=900&h=500&s=1" target="_blank" class="text-blue-600 hover:underline">Château du Haut-Kœnigsbourg</a> (environ 2 heures)</li>
+                        <li><span class="font-semibold">12h40 - 13h40 :</span> 🍔 Déjeuner (Pique-nique ou restauration rapide/simple)</li>
+                        <li><span class="font-semibold">13h40 - 14h40 :</span> 🎢 Route du Château du Haut-Kœnigsbourg à <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">Europa-Park (Rust)</a> (environ 1h de route)</li>
+                        <li><span class="font-semibold">15h30 :</span> 🛎️ Arrivée à l'<a href="https://www.europapark.de/fr/sejourner/hotel-4-etoiles-el-andaluz" target="_blank" class="text-blue-600 hover:underline">hôtel El Andaluz</a> et Check-in</li>
+                        <li><span class="font-semibold">Soir :</span> 🌙 Installation et Détente à l'hôtel El Andaluz. Dîner et nuit sur place.</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/2b/14/6c/vue-aerienne-du-chateau.jpg?w=900&h=500&s=1" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/2b/14/6c/vue-aerienne-du-chateau.jpg?w=900&h=500&s=1" alt="Image du Château du Haut-Kœnigsbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-21" disabled>+</button>
             </div>
         </div>
 
@@ -436,7 +252,7 @@
         </h2>
 
         <!-- Jour 3 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-22">
+        <div id="day-2025-07-22" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day3')">
                 <h3 class="text-xl font-semibold">🎡 Jour 3 (Mardi 22 juillet) : Journée à Europa-Park</h3>
                 <span id="arrow-day3" class="transform transition-transform duration-300">▼</span>
@@ -444,20 +260,19 @@
             <div id="content-day3" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-22" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li>🎉 Profitez de la première journée complète dans le <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">parc d'attractions principal</a>.</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_267,q_40,w_400/hotelier-images/2b/eb/ed58339cacae9fda06a7fc04792d1d63adcec85bfa38071eeb3fdc395a96.jpeg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_267,q_40,w_400/hotelier-images/2b/eb/ed58339cacae9fda06a7fc04792d1d63adcec85bfa38071eeb3fdc395a96.jpeg" alt="Image d'Europa-Park" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-22" disabled>+</button>
             </div>
         </div>
 
         <!-- Jour 4 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-23">
+        <div id="day-2025-07-23" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day4')">
                 <h3 class="text-xl font-semibold">🎡 Jour 4 (Mercredi 23 juillet) : Journée à Europa-Park</h3>
                 <span id="arrow-day4" class="transform transition-transform duration-300">▼</span>
@@ -465,20 +280,19 @@
             <div id="content-day4" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-23" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li>🎢 Deuxième journée pour explorer les différents univers et attractions d'<a href="https://restaurant-musculus.fr/wp-content/uploads/2010/08/Europapark.jpg" target="_blank" class="text-blue-600 hover:underline">Europa-Park</a>.</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://restaurant-musculus.fr/wp-content/uploads/2010/08/Europapark.jpg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://restaurant-musculus.fr/wp-content/uploads/2010/08/Europapark.jpg" alt="Autre image d'Europa-Park" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-23" disabled>+</button>
             </div>
         </div>
 
         <!-- Jour 5 (Rulantica) -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-24">
+        <div id="day-2025-07-24" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day5')">
                 <h3 class="text-xl font-semibold">🌊 Jour 5 (Jeudi 24 juillet) : Journée à Rulantica</h3>
                 <span id="arrow-day5" class="transform transition-transform duration-300">▼</span>
@@ -486,20 +300,19 @@
             <div id="content-day5" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-24" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li>🏊‍♀️ Préparez-vous pour une journée aquatique et pleine de glissades au <a href="https://bocir-prod-bucket.s3.amazonaws.com/medias/bdw90XUz6T/image/Rulantica_Nordiskturn_Vikingl_p_41676370579122-format1by1.jpg" target="_blank" class="text-blue-600 hover:underline">parc aquatique Rulantica</a> !</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://www.ambassadeurs.alsace/sites/ambassadeurs/files/xep19_va_020_rulantica_motiv_vorlagen_picturepark_dina5_quer_fr-1_113861.jpg.pagespeed.ic.La2ql5hnyK.jpg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://www.ambassadeurs.alsace/sites/ambassadeurs/files/xep19_va_020_rulantica_motiv_vorlagen_picturepark_dina5_quer_fr-1_113861.jpg.pagespeed.ic.La2ql5hnyK.jpg" alt="Image de Rulantica" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-24" disabled>+</button>
             </div>
         </div>
 
         <!-- Jour 6 (Europa-Park et Retour) -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-25">
+        <div id="day-2025-07-25" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day6')">
                 <h3 class="text-xl font-semibold">🎡 Jour 6 (Vendredi 25 juillet) : Europa-Park et départ vers Strasbourg</h3>
                 <span id="arrow-day6" class="transform transition-transform duration-300">▼</span>
@@ -507,15 +320,17 @@
             <div id="content-day6" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-25" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li>✨ Dernière journée pour profiter de vos attractions préférées ou découvrir ce que vous n'avez pas encore eu le temps de faire à <a href="https://www.europapark.de/fr" target="_blank" class="text-blue-600 hover:underline">Europa-Park</a>.</li>
+                        <li><span class="font-semibold">Fin de journée :</span> 🛣️ Après avoir profité de votre dernière journée à Europa-Park, prenez la route vers Lingolsheim.</li>
+                        <li><span class="font-semibold">Temps de route :</span> ⏱️ Environ 50 min - 1h de route.</li>
+                        <li><span class="font-semibold">Soir :</span> 🛌 Arrivée et installation à l'<a href="https://www.campanile.com/fr/hotels/campanile-strasbourg-lingolsheim" target="_blank" class="text-blue-600 hover:underline">Hôtel Campanile Strasbourg - Lingolsheim</a>. Dîner et première nuit sur place.</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://s3.travel-cdn.net/pictures/65500/gallery_hd.jpg?rev=3" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://s3.travel-cdn.net/pictures/65500/gallery_hd.jpg?rev=3" alt="Image de Strasbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-25" disabled>+</button>
             </div>
         </div>
 
@@ -525,7 +340,7 @@
         </h2>
 
         <!-- Jour 7 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-26">
+        <div id="day-2025-07-26" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day7')">
                 <h3 class="text-xl font-semibold">🏛️ Jour 7 (Samedi 26 juillet) : Journée complète à Strasbourg</h3>
                 <span id="arrow-day7" class="transform transition-transform duration-300">▼</span>
@@ -533,20 +348,28 @@
             <div id="content-day7" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-26" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li><span class="font-semibold">08h30 - 09h30 :</span> 🥐 Lever et Petit-déjeuner à l'hôtel.</li>
+                        <li><span class="font-semibold">09h30 - 09h35 :</span> 🚶‍♀️ Marche de l'Hôtel à l'arrêt de bus "Tanneries" (environ 2 min).</li>
+                        <li><span class="font-semibold">09h35 - 10h00 :</span> 🚌 Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min). Plus d'infos sur les transports en commun de Strasbourg sur le site de la <a href="https://www.cts-strasbourg.eu/fr/" target="_blank" class="text-blue-600 hover:underline">CTS</a>.</li>
+                        <li><span class="font-semibold">10h00 - 12h00 :</span> ⛪ Visite de la <a href="https://www.cathedrale-strasbourg.fr/" target="_blank" class="text-blue-600 hover:underline">Cathédrale Notre-Dame de Strasbourg</a>.</li>
+                        <li><span class="font-semibold">12h00 - 14h00 :</span> 🍔 Déjeuner (Pique-nique ou boulangerie/sandwicherie).</li>
+                        <li><span class="font-semibold">14h00 - 15h30 :</span> 🛥️ Excursion en Bateau-Mouche <a href="https://www.batorama.com/fr/" target="_blank" class="text-blue-600 hover:underline">Batorama</a> (Présence à 14h00 pour départ à 14h15).</li>
+                        <li><span class="font-semibold">15h30 - 17h30 :</span> 🏘️ Balade dans la Petite France et les Ponts Couverts.</li>
+                        <li><span class="font-semibold">17h30 - 18h30 :</span> 🌳 Détente au Parc de l'Orangerie (optionnel).</li>
+                        <li><span class="font-semibold">19h00 :</span> 🍕 Dîner à Strasbourg.</li>
+                        <li><span class="font-semibold">21h00 :</span> 😴 Retour à l'hôtel et Nuit.</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://www.vinci-autoroutes.com/static/81d12a3bf141348d9b425be379bbf420/cathedrale-strasbourg-idee-sortie-vinci-autoroutes.jpg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://www.vinci-autoroutes.com/static/81d12a3bf141348d9b425be379bbf420/cathedrale-strasbourg-idee-sortie-vinci-autoroutes.jpg" alt="Image de Strasbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-26" disabled>+</button>
             </div>
         </div>
 
         <!-- Jour 8 -->
-        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-27">
+        <div id="day-2025-07-27" class="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day8')">
                 <h3 class="text-xl font-semibold">🏞️ Jour 8 (Dimanche 27 juillet) : De Lingolsheim (Strasbourg) via Salins-les-Bains à Charvieu-Chavagneux</h3>
                 <span id="arrow-day8" class="transform transition-transform duration-300">▼</span>
@@ -554,15 +377,20 @@
             <div id="content-day8" class="p-4 hidden">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <!-- Contenu du planning (à gauche) -->
-                    <div id="planningContent-2025-07-27" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
-                        <p class="text-center text-gray-500">Chargement des événements...</p>
-                    </div>
+                    <ul class="list-disc list-inside space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <li><span class="font-semibold">08h00 - 09h00 :</span> ☕ Lever et Petit-déjeuner à l'hôtel.</li>
+                        <li><span class="font-semibold">09h00 - 09h30 :</span> 🎒 Préparation et Check-out de l'hôtel.</li>
+                        <li><span class="font-semibold">09h30 - 13h00 :</span> 🛣️ Trajet de Lingolsheim à <a href="https://www.youtube.com/watch?v=7_0Ct1Uazc4&t=5s" target="_blank" class="text-blue-600 hover:underline">Salins-les-Bains</a> (environ 3h30 de route).</li>
+                        <li><span class="font-semibold">13h00 - 14h00 :</span> 🍽️ Déjeuner à Salins-les-Bains.</li>
+                        <li><span class="font-semibold">14h00 - 16h00 :</span> 🧂 Visite des <a href="https://www.youtube.com/watch?v=7_0Ct1Uazc4&t=5s" target="_blank" class="text-blue-600 hover:underline">Grandes Salines de Salins-les-Bains</a> (environ 1h30 à 2h).</li>
+                        <li><span class="font-semibold">16h00 - 18h00 :</span> 🚗 Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).</li>
+                        <li><span class="font-semibold">18h00 :</span> 🏠 Arrivée à votre domicile. Fin des vacances !</li>
+                    </ul>
                     <!-- Image (à droite) -->
                     <div class="w-full md:w-1/2 flex justify-center items-center p-2">
-                        <img src="https://www.archeologie-et-histoire-morestel.fr/wp-content/uploads/2021/06/BANDEAU-SALINE-15-JUILLET-2021.jpg" alt="" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                        <img src="https://www.archeologie-et-histoire-morestel.fr/wp-content/uploads/2021/06/BANDEAU-SALINE-15-JUILLET-2021.jpg" alt="Image des Salines de Salins-les-Bains" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
                     </div>
                 </div>
-                <button class="add-event-plus-btn" data-day-target="2025-07-27" disabled>+</button>
             </div>
         </div>
 
@@ -739,195 +567,63 @@
             </div>
         </div>
 
-        <!-- Section Météo Actuelle (Simulation) -->
-        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
-            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-weather')">
-                <h2 class="text-2xl sm:text-3xl font-bold">☀️ Météo en direct</h2>
-                <span id="arrow-summary-weather" class="transform transition-transform duration-300">▼</span>
-            </div>
-            <div id="content-summary-weather" class="p-4 hidden">
-                <div id="weatherDisplay" class="text-gray-800 text-left">
-                    <ul class="list-disc list-inside space-y-2 text-gray-800">
-                        <li><span class="font-semibold">Colmar :</span>
-                            <div class="ml-4">
-                                Aujourd'hui : <span id="weather-colmar-today">Chargement...</span><br>
-                                Demain : <span id="weather-colmar-tomorrow">Chargement...</span>
-                            </div>
-                        </li>
-                        <li><span class="font-semibold">Europa-Park / Rust :</span>
-                            <div class="ml-4">
-                                Aujourd'hui : <span id="weather-rust-today">Chargement...</span><br>
-                                Demain : <span id="weather-rust-tomorrow">Chargement...</span>
-                            </div>
-                        </li>
-                        <li><span class="font-semibold">Strasbourg :</span>
-                            <div class="ml-4">
-                                Aujourd'hui : <span id="weather-strasbourg-today">Chargement...</span><br>
-                                Demain : <span id="weather-strasbourg-tomorrow">Chargement...</span>
-                            </div>
-                        </li>
-                        <li><span class="font-semibold">Salins-les-Bains / Jura :</span>
-                            <div class="ml-4">
-                                Aujourd'hui : <span id="weather-salins-today">Chargement...</span><br>
-                                Demain : <span id="weather-salins-tomorrow">Chargement...</span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <p class="text-xs text-gray-500 mt-2">Ces données sont des prévisions en temps quasi-réel via OpenWeatherMap.</p>
-            </div>
-        </div>
-
-        <!-- Nouvelle Section: Liste de Colisage -->
-        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+        <!-- Section: Liste de Colisage -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
             <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('packing-list')">
                 <h2 class="text-2xl sm:text-3xl font-bold">🎒 Liste de Colisage</h2>
                 <span id="arrow-packing-list" class="transform transition-transform duration-300">▼</span>
             </div>
             <div id="content-packing-list" class="p-4 hidden">
-                <div id="packingListAddControls" class="flex mb-4 add-item-controls">
-                    <input type="text" id="newItemInput" placeholder="Ajouter un élément à la liste..." class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <button id="addItemButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg transition duration-300 ease-in-out">
-                        Ajouter
-                    </button>
+                <div class="mb-4 flex items-center">
+                    <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="add-item-input">
+                    <button id="unlockButton" class="add-item-btn bg-blue-500 hover:bg-blue-700">Déverrouiller</button>
                 </div>
-                <div id="packingListItems" class="bg-white rounded-lg shadow-inner">
+                <p id="passwordMessage" class="text-sm text-red-600 mb-2 hidden">Mot de passe incorrect.</p>
+
+                <div class="mb-4 flex" id="packingListControls">
+                    <input type="text" id="newItemInput" placeholder="Ajouter un article..." class="add-item-input" disabled>
+                    <button id="addItemButton" class="add-item-btn" disabled>Ajouter</button>
+                </div>
+                <div id="packingListItems" class="text-gray-800">
+                    <!-- Les articles de la liste de colisage seront ajoutés ici par JavaScript -->
                     <p class="text-center text-gray-500 p-4" id="packingListStatus">Chargement de la liste...</p>
                 </div>
-                <p class="text-xs text-gray-500 mt-2">Cette liste est collaborative et sauvegardée en temps réel. Les changements sont visibles par tous ceux qui accèdent à ce planning.</p>
+                <p class="text-xs text-gray-500 mt-2">Cochez les articles une fois qu'ils sont emballés. Vous pouvez ajouter ou supprimer des articles.</p>
                 <p class="text-xs text-gray-500 mt-1">Votre identifiant utilisateur pour cette session est : <span id="userIdDisplay" class="font-bold">Chargement...</span></p>
             </div>
         </div>
 
     </div>
 
-    <!-- Modale pour ajouter/modifier un événement -->
-    <div id="eventModalOverlay" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closeEventModal">&times;</button>
-            <h3 class="text-xl font-bold text-gray-800 mb-4 text-left" id="modalTitle">Ajouter un événement</h3>
-            
-            <div class="mb-4">
-                <label for="modalEventDate" class="block text-gray-700 text-sm font-bold mb-2 text-left">Jour :</label>
-                <input type="date" id="modalEventDate" class="add-input w-full" disabled> <!-- Date will be pre-filled and disabled -->
-            </div>
-
-            <div class="modal-form-grid">
-                <div>
-                    <label for="modalEventStartTime">Heure de début :</label>
-                    <input type="time" id="modalEventStartTime" class="add-input w-full">
-                </div>
-                <div>
-                    <label for="modalEventEndTime">Heure de fin :</label>
-                    <input type="time" id="modalEventEndTime" class="add-input w-full">
-                </div>
-            </div>
-            <label for="modalEventSubject" class="block text-gray-700 text-sm font-bold mb-2 text-left">Objet de l'événement :</label>
-            <input type="text" id="modalEventSubject" placeholder="Ex: Achat souvenirs" class="add-input w-full mb-4">
-            
-            <button id="saveEventButton" class="add-item-btn w-full">Ajouter l'événement</button>
-            <input type="hidden" id="editingEventId"> <!-- Hidden field to store ID of event being edited -->
-            <input type="hidden" id="editingEventDay"> <!-- Hidden field to store day of event being edited -->
-        </div>
-    </div>
-
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURATION OPENWEATHERMAP ---
-        // NOTE: The API key below is a placeholder. If you intend to deploy this,
-        // you should replace it with your actual OpenWeatherMap API key.
         const OPENWEATHER_API_KEY = "51aebd101995305de8a90d128247bdad"; 
 
-        // --- Global Variables ---
-        const MOCK_PASSWORD = "EP2025";
-        const passwordInput = document.getElementById('passwordInput');
-        const unlockButton = document.getElementById('unlockButton');
-        const relockButton = document.getElementById('relockButton'); // Renamed from mockRelockButton
-        const passwordMessage = document.getElementById('passwordMessage');
-
-        let db;
-        let auth;
-        let userId = 'Chargement...';
-        let appId;
-        let packingListColRef;
-        let eventsColRef; // New collection reference for planning events
-
-        // --- Countdown Logic ---
-        const countdownDisplay = document.getElementById('countdown');
-        const vacationStartDate = new Date('2025-07-20T09:30:00'); // Date de début des vacances
-        const vacationEndDate = new Date('2025-07-27T18:00:00'); // Date de fin des vacances
-
-        function startCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            const countdownTitleElement = document.querySelector('.countdown-title');
-
-            const updateCountdown = () => {
-                const now = new Date().getTime();
-
-                if (now < vacationStartDate.getTime()) {
-                    // Avant le début des vacances
-                    const distance = vacationStartDate - now;
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    countdownTitleElement.textContent = "Départ dans :";
-                    countdownElement.innerHTML = `
-                        <div class="countdown-unit">
-                            <span class="countdown-value">${days}</span>
-                            <span class="countdown-label">J</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span class="countdown-value">${hours}</span>
-                            <span class="countdown-label">H</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span class="countdown-value">${minutes}</span>
-                            <span class="countdown-label">M</span>
-                        </div>
-                        <div class="countdown-unit">
-                            <span class="countdown-value">${seconds}</span>
-                            <span class="countdown-label">S</span>
-                        </div>
-                    `;
-                } else if (now >= vacationStartDate.getTime() && now < vacationEndDate.getTime()) {
-                    // Pendant les vacances
-                    if (window.countdownInterval) {
-                        clearInterval(window.countdownInterval); 
-                    }
-                    countdownTitleElement.textContent = "";
-                    countdownElement.innerHTML = `<div class="text-green-700 font-bold text-base sm:text-lg">🎉 Les vacances ont commencé !</div>`;
-                } else {
-                    // Après la fin des vacances
-                    const elapsedDistance = now - vacationEndDate.getTime();
-                    const days = Math.floor(elapsedDistance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((elapsedDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((elapsedDistance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((elapsedDistance % (1000 * 60)) / 1000);
-
-                    countdownTitleElement.textContent = "";
-                    countdownElement.innerHTML = `
-                        <div class="text-red-700 font-bold text-base sm:text-lg">Vacances terminées 😔</div>
-                        <div class="text-red-600 text-sm mt-1">depuis ${days}J ${hours}H ${minutes}M ${seconds}S</div>
-                    `;
-                    if (window.countdownInterval) {
-                        clearInterval(window.countdownInterval); 
-                    }
-                }
-            };
-
-            window.countdownInterval = setInterval(updateCountdown, 1000);
-            updateCountdown();
+        // Fonction JavaScript pour basculer la visibilité du contenu du jour
+        window.toggleDay = function(dayId) {
+            const content = document.getElementById(`content-${dayId}`);
+            const arrow = document.getElementById(`arrow-${dayId}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotated');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotated');
+            }
         }
 
         // --- Météo en temps réel via OpenWeatherMap ---
-        const weatherDisplay = document.getElementById('weatherDisplay');
 
+        /**
+         * Fetches current and tomorrow's weather data for a given city.
+         * @param {string} city - The name of the city.
+         * @returns {Promise<{current: object, tomorrow: object|null}>} - An object containing current and tomorrow's weather data.
+         */
         async function fetchWeatherData(city) {
             const currentWeatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
             const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
@@ -936,29 +632,34 @@
             let tomorrowForecastData = null;
 
             try {
+                // Fetch current weather
                 const currentWeatherResponse = await fetch(currentWeatherApiUrl);
                 if (!currentWeatherResponse.ok) {
                     throw new Error(`Erreur HTTP: ${currentWeatherResponse.status} pour la météo actuelle de ${city}`);
                 }
                 currentWeatherData = await currentWeatherResponse.json();
 
+                // Fetch forecast weather
                 const forecastResponse = await fetch(forecastApiUrl);
                 if (!forecastResponse.ok) {
                     throw new Error(`Erreur HTTP: ${forecastResponse.status} pour les prévisions de ${city}`);
                 }
                 const forecastData = await forecastResponse.json();
 
+                // Calculate tomorrow's date
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
-                tomorrow.setHours(0, 0, 0, 0);
+                tomorrow.setHours(0, 0, 0, 0); // Set to start of tomorrow
 
+                // Filter forecast data for tomorrow
                 const tomorrowEntries = forecastData.list.filter(entry => {
-                    const entryDate = new Date(entry.dt * 1000);
-                    entryDate.setHours(0, 0, 0, 0);
+                    const entryDate = new Date(entry.dt * 1000); // Convert timestamp to Date object
+                    entryDate.setHours(0, 0, 0, 0); // Set to start of entry day
                     return entryDate.getTime() === tomorrow.getTime();
                 });
 
                 if (tomorrowEntries.length > 0) {
+                    // Find the entry closest to midday tomorrow for a representative forecast
                     const middayTomorrow = new Date(tomorrow);
                     middayTomorrow.setHours(12, 0, 0, 0);
 
@@ -976,6 +677,12 @@
             return { current: currentWeatherData, tomorrow: tomorrowForecastData };
         }
 
+        /**
+         * Renders weather information into the specified HTML elements.
+         * @param {object} weatherData - The data object containing current and tomorrow's weather.
+         * @param {string} todayElementId - The ID of the HTML element for today's weather.
+         * @param {string} tomorrowElementId - The ID of the HTML element for tomorrow's weather.
+         */
         function renderWeather(weatherData, todayElementId, tomorrowElementId) {
             const todayElement = document.getElementById(todayElementId);
             const tomorrowElement = document.getElementById(tomorrowElementId);
@@ -1007,10 +714,11 @@
             }
         }
 
+        // Function to load weather for all cities
         async function loadAllWeather() {
             const cities = [
                 { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
-                { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' },
+                { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' }, // Rust is the city where Europa-Park is located
                 { name: 'Strasbourg', todayId: 'weather-strasbourg-today', tomorrowId: 'weather-strasbourg-tomorrow' },
                 { name: 'Salins-les-Bains', todayId: 'weather-salins-today', tomorrowId: 'weather-salins-tomorrow' }
             ];
@@ -1021,7 +729,81 @@
             }
         }
 
-        // --- Date Highlight Logic ---
+        // --- Compte à Rebours ---
+        function startCountdown() {
+            // Date de début des vacances : 20 juillet 2025, 09h30
+            const startDate = new Date('2025-07-20T09:30:00');
+            // Date de fin des vacances : 27 juillet 2025, 18h00
+            const endDate = new Date('2025-07-27T18:00:00');
+
+            const countdownElement = document.getElementById('countdown');
+            const countdownTitleElement = document.querySelector('.countdown-title'); // Sélectionne le titre
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+
+                if (now < startDate.getTime()) {
+                    // Avant le début des vacances
+                    const distance = startDate - now;
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = "Départ dans :";
+                    countdownElement.innerHTML = `
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${days}</span>
+                            <span class="countdown-label">J</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${hours}</span>
+                            <span class="countdown-label">H</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${minutes}</span>
+                            <span class="countdown-label">M</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${seconds}</span>
+                            <span class="countdown-label">S</span>
+                        </div>
+                    `;
+                } else if (now >= startDate.getTime() && now < endDate.getTime()) {
+                    // Pendant les vacances
+                    // Clear interval only if it's currently running (to avoid errors if already cleared)
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
+                    countdownTitleElement.textContent = ""; // Cache le titre
+                    countdownElement.innerHTML = `<div class="text-green-700 font-bold text-base sm:text-lg">🎉 Les vacances ont commencé !</div>`;
+                } else {
+                    // Après la fin des vacances
+                    const elapsedDistance = now - endDate.getTime(); // Temps écoulé depuis la fin des vacances
+                    const days = Math.floor(elapsedDistance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((elapsedDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((elapsedDistance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((elapsedDistance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = ""; // Cache le titre
+                    countdownElement.innerHTML = `
+                        <div class="text-red-700 font-bold text-base sm:text-lg">Vacances terminées 😔</div>
+                        <div class="text-red-600 text-sm mt-1">depuis ${days}J ${hours}H ${minutes}M ${seconds}S</div>
+                    `;
+                    // Clear interval only if it's currently running
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
+                }
+            }
+
+            // Mettre à jour le compte à rebours toutes les secondes
+            // Store the interval ID to be able to clear it later
+            window.countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown(); // Appel initial pour afficher le compte à rebours immédiatement
+        }
+
+        // Fonction pour formater une date en YYYY-MM-DD
         function formatDate(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1029,26 +811,75 @@
             return `${year}-${month}-${day}`;
         }
 
+        // Fonction pour mettre à jour la mise en évidence du jour
         function updateDayHighlight() {
             const today = new Date();
             const todayFormatted = formatDate(today);
 
-            document.querySelectorAll('.day-section').forEach(card => {
+            // Supprimer la classe de mise en évidence de tous les jours
+            document.querySelectorAll('[id^="day-2025-07-"]').forEach(card => {
                 card.classList.remove('highlight-today');
             });
 
-            const todayCard = document.querySelector(`.day-section[data-day-date="${todayFormatted}"]`);
+            // Ajouter la classe de mise en évidence au jour correspondant à la date actuelle
+            const todayCard = document.getElementById(`day-${todayFormatted}`);
 
             if (todayCard) {
                 todayCard.classList.add('highlight-today');
+                // Optionnel: Faire défiler la page jusqu'au jour actuel
                 todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
-        // --- Firebase/Firestore Initialization ---
+        // --- Logique de la Liste de Colisage (avec Firestore et protection par mot de passe) ---
+        let db;
+        let auth;
+        let userId = 'Chargement...'; // Initialisation temporaire
+        let appId; // Déclarer appId ici pour qu'il soit accessible dans le module
+        let packingListColRef;
+
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockButton = document.getElementById('unlockButton');
+        const passwordMessage = document.getElementById('passwordMessage');
+        const packingListControls = document.getElementById('packingListControls');
+        const newItemInput = document.getElementById('newItemInput');
+        const addItemButton = document.getElementById('addItemButton');
+        const packingListItems = document.getElementById('packingListItems');
+        const packingListStatus = document.getElementById('packingListStatus');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+
+        const UNLOCK_PASSWORD = "EP2025"; // Le mot de passe pour déverrouiller la modification
+
+        // Fonction pour activer/désactiver les contrôles de la liste de colisage
+        function enablePackingListEdit(enabled) {
+            newItemInput.disabled = !enabled;
+            addItemButton.disabled = !enabled;
+            // Activer/désactiver les boutons de suppression sur les éléments existants
+            packingListItems.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.disabled = !enabled;
+            });
+            packingListItems.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.disabled = !enabled;
+            });
+        }
+
+        // Gestionnaire pour le bouton de déverrouillage
+        unlockButton.addEventListener('click', () => {
+            if (passwordInput.value === UNLOCK_PASSWORD) {
+                enablePackingListEdit(true);
+                passwordInput.classList.add('hidden'); // Cache l'input du mot de passe
+                unlockButton.classList.add('hidden'); // Cache le bouton de déverrouillage
+                passwordMessage.classList.add('hidden'); // Cache le message d'erreur
+            } else {
+                passwordMessage.textContent = "Mot de passe incorrect.";
+                passwordMessage.classList.remove('hidden');
+            }
+        });
+
+        // Fonction d'initialisation de Firebase et de l'authentification
         async function initializeFirebase() {
             try {
-                // Using the hardcoded firebaseConfig from the provided file
+                // Ta configuration Firebase réelle
                 const firebaseConfig = {
                     apiKey: "AIzaSyBbJTLdUfYicbfRIWpa1UI2hriGEWtrsZA",
                     authDomain: "base-vacances-ete-2025.firebaseapp.com",
@@ -1058,6 +889,10 @@
                     appId: "1:446416873148:web:f1b23b0d98785da53c52b9"
                 };
 
+                console.log("Firebase Config utilisée:", firebaseConfig); // Log pour le débogage
+
+                // L'appId pour Firestore doit correspondre au projectId de ta config Firebase
+                // C'est important pour les règles de sécurité Firestore
                 appId = firebaseConfig.projectId; 
 
                 if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
@@ -1070,25 +905,19 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
+                // Gérer l'authentification
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         userIdDisplay.textContent = userId;
                         console.log("Utilisateur connecté:", userId);
                         packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
-                        eventsColRef = collection(db, `artifacts/${appId}/public/data/events`); // Initialize events collection
-                        setupPackingListListener();
-                        await initializeEventsFromStaticData(); // Populate events if DB is empty
-                        setupEventsListeners(); // Start listening for event changes
-                        enableAllControls(false); // Ensure locked state on initial load
+                        setupPackingListListener(); // Démarrer l'écoute de la liste de colisage
                     } else {
+                        // Si pas de token initial fourni par l'environnement, se connecter anonymement
+                        // Ceci est important pour que même les utilisateurs non connectés puissent interagir
                         try {
-                            // Use __initial_auth_token if available from Canvas environment
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
+                            await signInAnonymously(auth);
                         } catch (anonError) {
                             console.error("Erreur lors de la connexion anonyme:", anonError);
                             packingListStatus.textContent = "Erreur d'authentification Firebase. Veuillez vérifier l'activation de la connexion anonyme dans votre console Firebase (section Authentication > Sign-in method).";
@@ -1102,357 +931,10 @@
             }
         }
 
-        // --- Global Control Management (Lock/Unlock) ---
-        function enableAllControls(enabled) {
-            // Manage password input and buttons
-            passwordInput.classList.toggle('hidden', enabled);
-            unlockButton.classList.toggle('hidden', enabled);
-            relockButton.style.display = enabled ? 'inline-block' : 'none';
-            passwordMessage.classList.add('hidden'); // Hide any error messages
-
-            // Manage planning items and plus buttons
-            document.querySelectorAll('.day-section').forEach(daySection => {
-                const plusButton = daySection.querySelector('.add-event-plus-btn');
-                const planningItems = daySection.querySelectorAll('.planning-item');
-                const deleteButtons = daySection.querySelectorAll('.planning-item .delete-btn');
-
-                if (plusButton) {
-                    plusButton.disabled = !enabled;
-                    plusButton.style.display = enabled ? 'inline-flex' : 'none'; // Show/hide plus button
-                }
-
-                planningItems.forEach(item => {
-                    item.classList.toggle('unlocked', enabled); // Add/remove 'unlocked' class for CSS
-                    item.style.pointerEvents = enabled ? 'auto' : 'none';
-                    item.style.cursor = enabled ? 'pointer' : 'default';
-                });
-
-                deleteButtons.forEach(btn => {
-                    btn.style.display = enabled ? 'inline-block' : 'none';
-                    btn.disabled = !enabled;
-                });
-            });
-
-            // Manage packing list controls
-            const packingListAddControls = document.getElementById('packingListAddControls');
-            if (packingListAddControls) {
-                packingListAddControls.classList.toggle('unlocked', enabled); // Add/remove 'unlocked' class for CSS
-                packingListAddControls.querySelectorAll('input, button').forEach(control => {
-                    control.disabled = !enabled;
-                });
-            }
-            document.querySelectorAll('#packingListItems .packing-list-item .delete-btn').forEach(btn => {
-                btn.style.display = enabled ? 'inline-block' : 'none';
-                btn.disabled = !enabled;
-            });
-            document.querySelectorAll('#packingListItems input[type="checkbox"]').forEach(checkbox => {
-                checkbox.disabled = !enabled;
-            });
-        }
-
-        function reLockControls() {
-            enableAllControls(false);
-            passwordInput.value = '';
-        }
-
-        // --- Event Management (Planning) ---
-        const eventModalOverlay = document.getElementById('eventModalOverlay');
-        const closeEventModalBtn = document.getElementById('closeEventModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalEventDate = document.getElementById('modalEventDate');
-        const modalEventStartTime = document.getElementById('modalEventStartTime');
-        const modalEventEndTime = document.getElementById('modalEventEndTime');
-        const modalEventSubject = document.getElementById('modalEventSubject');
-        const saveEventButton = document.getElementById('saveEventButton');
-        const editingEventId = document.getElementById('editingEventId');
-        const editingEventDay = document.getElementById('editingEventDay');
-
-        // Initial static planning data (from the original HTML, now used for initial DB population)
-        const initialPlanningData = {
-            '2025-07-20': [
-                { startTime: '09:30', endTime: '09:30', subject: '🚗 Départ de Charvieu-Chavagneux' },
-                { startTime: '09:30', endTime: '11:30', subject: '🛣️ Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)' },
-                { startTime: '11:30', endTime: '12:30', subject: '🥪 Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.' },
-                { startTime: '12:30', endTime: '14:30', subject: '🛣️ Reprise du Trajet vers Colmar (environ 2h de route)' },
-                { startTime: '14:30', endTime: '15:00', subject: '🛎️ Arrivée à Colmar et Check-in à l\'Hôtel Primo' },
-                { startTime: '15:00', endTime: '17:00', subject: '🧸 Visite du Musée du Jouet de Colmar' },
-                { startTime: '17:00', endTime: '19:00', subject: '🚶‍♀️ Balade dans la Petite Venise et le centre historique' },
-                { startTime: '19:00', endTime: '21:00', subject: '🍽️ Dîner à Colmar' },
-                { startTime: '21:00', endTime: '23:00', subject: '😴 Retour à l\'hôtel et Nuit' },
-            ],
-            '2025-07-21': [
-                { startTime: '09:00', endTime: '10:00', subject: '☕ Lever et Petit-déjeuner à l\'Hôtel Primo Colmar, puis check-out.' },
-                { startTime: '10:00', endTime: '10:40', subject: '🛣️ Route de Colmar au Château du Haut-Kœnigsbourg (environ 40 min de route)' },
-                { startTime: '10:40', endTime: '12:40', subject: '⚔️ Visite du Château du Haut-Kœnigsbourg (environ 2 heures)' },
-                { startTime: '12:40', endTime: '13:40', subject: '🍔 Déjeuner (Pique-nique ou restauration rapide/simple)' },
-                { startTime: '13:40', endTime: '14:40', subject: '🎢 Route du Château du Haut-Kœnigsbourg à Europa-Park (Rust) (environ 1h de route)' },
-                { startTime: '15:30', endTime: '15:30', subject: '🛎️ Arrivée à l\'hôtel El Andaluz et Check-in' },
-                { startTime: '17:00', endTime: '23:00', subject: '🌙 Installation et Détente à l\'hôtel El Andaluz. Dîner et nuit sur place.' },
-            ],
-            '2025-07-22': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎉 Journée complète à Europa-Park. Profitez des attractions et spectacles !' }
-            ],
-            '2025-07-23': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎢 Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.' }
-            ],
-            '2025-07-24': [
-                { startTime: '10:00', endTime: '19:00', subject: '🏊‍♀️ Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.' }
-            ],
-            '2025-07-25': [
-                { startTime: '09:00', endTime: '15:00', subject: '✨ Dernière matinée à Europa-Park. Profitez des attractions favorites.' },
-                { startTime: '15:00', endTime: '16:00', subject: '🛣️ Départ d\'Europa-Park vers Lingolsheim (environ 50 min - 1h de route).' },
-                { startTime: '16:00', endTime: '22:00', subject: '🛌 Arrivée et installation à l\'Hôtel Campanile Strasbourg - Lingolsheim. Dîner et première nuit sur place.' }
-            ],
-            '2025-07-26': [
-                { startTime: '08:30', endTime: '09:30', subject: '🥐 Lever et Petit-déjeuner à l\'hôtel.' },
-                { startTime: '09:30', endTime: '10:00', subject: '🚌 Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min).' },
-                { startTime: '10:00', endTime: '12:00', subject: '⛪ Visite de la Cathédrale Notre-Dame de Strasbourg.' },
-                { startTime: '12:00', endTime: '14:00', subject: '🍔 Déjeuner (Pique-nique ou boulangerie/sandwicherie).' },
-                { startTime: '14:00', endTime: '15:30', subject: '🛥️ Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).' },
-                { startTime: '15:30', endTime: '17:30', subject: '🏘️ Balade dans la Petite France et les Ponts Couverts.' },
-                { startTime: '17:30', endTime: '18:30', subject: '🌳 Détente au Parc de l\'Orangerie (optionnel).' },
-                { startTime: '19:00', endTime: '21:00', subject: '🍕 Dîner à Strasbourg.' },
-                { startTime: '21:00', endTime: '23:00', subject: '😴 Retour à l\'hôtel et Nuit.' }
-            ],
-            '2025-07-27': [
-                { startTime: '08:00', endTime: '09:00', subject: '☕ Lever et Petit-déjeuner à l\'hôtel.' },
-                { startTime: '09:00', endTime: '09:30', subject: '🎒 Préparation et Check-out de l\'hôtel.' },
-                { startTime: '09:30', endTime: '13:00', subject: '🛣️ Trajet de Lingolsheim à Salins-les-Bains (environ 3h30 de route).' },
-                { startTime: '13:00', endTime: '14:00', subject: '🍽️ Déjeuner à Salins-les-Bains.' },
-                { startTime: '14:00', endTime: '16:00', subject: '🧂 Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).' },
-                { startTime: '16:00', endTime: '18:00', subject: '🚗 Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).' },
-                { startTime: '18:00', endTime: '18:00', subject: '🏠 Arrivée à votre domicile. Fin des vacances !' }
-            ]
-        };
-
-
-        async function initializeEventsFromStaticData() {
-            // Get all unique day dates from the initialPlanningData
-            const dayDates = Object.keys(initialPlanningData);
-
-            for (const dayDate of dayDates) {
-                // Check if there are any events for this day in Firestore
-                const q = query(eventsColRef); // Query the main events collection
-                const snapshot = await getDocs(q);
-                const existingEventsForDay = snapshot.docs.filter(doc => doc.data().dayId === dayDate);
-
-                if (existingEventsForDay.length === 0) {
-                    console.log(`Initialisation des événements pour ${dayDate} depuis les données statiques.`);
-                    let order = 0; // To maintain order
-                    for (const event of initialPlanningData[dayDate]) {
-                        await addDoc(eventsColRef, {
-                            dayId: dayDate,
-                            startTime: event.startTime,
-                            endTime: event.endTime || '', // Ensure endTime is stored, even if empty
-                            subject: event.subject,
-                            order: order++, // Assign an order for sorting
-                            createdAt: serverTimestamp(),
-                            createdBy: userId
-                        });
-                    }
-                } else {
-                    console.log(`Événements déjà présents pour ${dayDate}. Pas d'initialisation depuis les données statiques.`);
-                }
-            }
-        }
-
-        function setupEventsListeners() {
-            // Get all day sections from the HTML
-            document.querySelectorAll('.day-section').forEach(daySection => {
-                const dayDate = daySection.dataset.dayDate; // Get the date from data-day-date attribute
-                const planningContentDiv = document.getElementById(`planningContent-${dayDate}`);
-                
-                // Create a query for events specific to this day
-                const q = query(
-                    collection(db, `artifacts/${appId}/public/data/events`),
-                    // We can add a where clause here to filter by dayId if needed,
-                    // but onSnapshot will fetch all and we filter in client for this example.
-                    // For large datasets, a 'where' clause would be more efficient.
-                    // For now, let's filter after fetching all to simplify the initial setup.
-                );
-
-                onSnapshot(q, (snapshot) => {
-                    const allEvents = [];
-                    snapshot.forEach((doc) => {
-                        allEvents.push({ id: doc.id, ...doc.data() });
-                    });
-
-                    // Filter events for the current day being rendered
-                    const dayEvents = allEvents.filter(event => event.dayId === dayDate);
-                    
-                    // Sort events by start time
-                    dayEvents.sort((a, b) => {
-                        const timeA = a.startTime || '00:00'; // Handle cases where startTime might be missing
-                        const timeB = b.startTime || '00:00';
-                        return timeA.localeCompare(timeB);
-                    });
-                    
-                    renderDayPlanning(dayDate, dayEvents);
-                }, (error) => {
-                    console.error(`Erreur lors de la récupération des événements pour ${dayDate}:`, error);
-                    if (planningContentDiv) {
-                        planningContentDiv.innerHTML = `<p class="text-center text-red-600">Erreur de chargement des événements pour ${dayDate}.</p>`;
-                    }
-                });
-            });
-        }
-
-        function renderDayPlanning(dayDate, items) {
-            const planningContentDiv = document.getElementById(`planningContent-${dayDate}`);
-            if (!planningContentDiv) return;
-
-            planningContentDiv.innerHTML = ''; // Clear existing items
-
-            if (items.length === 0) {
-                planningContentDiv.innerHTML = '<p class="text-center text-gray-500">Aucun événement planifié pour cette journée. Ajoutez-en un !</p>';
-                // No need to re-apply controls here, as enableAllControls will be called after this function
-                return;
-            }
-
-            items.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'planning-item'; // Class for styling and JS selection
-                itemDiv.dataset.id = item.id; // Store Firestore document ID
-                itemDiv.dataset.day = dayDate; // Store day for context
-                
-                let timeDisplay = item.startTime;
-                if (item.endTime && item.startTime !== item.endTime) {
-                    timeDisplay += ` - ${item.endTime}`;
-                }
-
-                itemDiv.innerHTML = `
-                    <span class="time">${timeDisplay} :</span> 
-                    <span>${item.subject}</span>
-                    <button class="delete-btn ml-auto">Supprimer</button>
-                `;
-
-                const deleteButton = itemDiv.querySelector('.delete-btn');
-                deleteButton.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent the parent itemDiv's click event from firing
-                    deletePlanningItem(dayDate, item.id);
-                });
-
-                itemDiv.addEventListener('click', () => {
-                    // Only allow editing if the interface is unlocked
-                    if (unlockButton.classList.contains('hidden')) { // If unlock button is hidden, it means it's unlocked
-                        editPlanningItem(dayDate, item.id);
-                    } else {
-                        console.log("Interface verrouillée. Déverrouillez pour modifier les événements.");
-                    }
-                });
-                
-                planningContentDiv.appendChild(itemDiv);
-            });
-            // After rendering all items, apply the current lock state to them
-            enableAllControls(unlockButton.classList.contains('hidden'));
-        }
-
-        async function savePlanningItem() {
-            const day = editingEventDay.value;
-            const startTime = modalEventStartTime.value;
-            const endTime = modalEventEndTime.value;
-            const subject = modalEventSubject.value.trim();
-            const idToEdit = editingEventId.value;
-
-            if (!day || !startTime || !subject) {
-                alert("Veuillez remplir au moins le jour, l'heure de début et l'objet de l'événement.");
-                return;
-            }
-
-            try {
-                if (idToEdit) {
-                    // Update existing document
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/events`, idToEdit), {
-                        startTime: startTime,
-                        endTime: endTime,
-                        subject: subject
-                    });
-                } else {
-                    // Add new document
-                    await addDoc(eventsColRef, {
-                        dayId: day,
-                        startTime: startTime,
-                        endTime: endTime,
-                        subject: subject,
-                        createdAt: serverTimestamp(), // For sorting new items
-                        createdBy: userId
-                    });
-                }
-                closeEventModal();
-            } catch (error) {
-                console.error("Erreur lors de la sauvegarde de l'événement:", error);
-                alert("Erreur lors de la sauvegarde de l'événement. Veuillez réessayer.");
-            }
-        }
-
-        async function deletePlanningItem(dayDate, idToDelete) {
-            // Using a simple confirm dialog for now, replace with custom modal for better UX
-            if (confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
-                try {
-                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/events`, idToDelete));
-                } catch (error) {
-                    console.error("Erreur lors de la suppression de l'événement:", error);
-                    alert("Erreur lors de la suppression de l'événement. Veuillez réessayer.");
-                }
-            }
-        }
-
-        function editPlanningItem(dayDate, itemId) {
-            // Find the item in the currently rendered DOM to get its data
-            const itemDiv = document.querySelector(`#planningContent-${dayDate} [data-id="${itemId}"]`);
-            if (!itemDiv) {
-                console.error("Élément de planning non trouvé pour l'édition:", itemId);
-                return;
-            }
-
-            const timeSpan = itemDiv.querySelector('.time');
-            const subjectSpan = itemDiv.querySelector('span:nth-child(2)'); // The span containing the subject text
-
-            const timeText = timeSpan.textContent.replace(' :', '').trim();
-            const timeParts = timeText.split(' - ');
-
-            const startTime = timeParts[0];
-            const endTime = timeParts.length > 1 ? timeParts[1] : '';
-            const subject = subjectSpan.textContent.trim();
-
-            modalTitle.textContent = "Modifier l'événement";
-            modalEventDate.value = dayDate;
-            modalEventStartTime.value = startTime;
-            modalEventEndTime.value = endTime;
-            modalEventSubject.value = subject;
-            editingEventId.value = itemId; // Store the ID of the event being edited
-            editingEventDay.value = dayDate; // Store the day of the event being edited
-
-            eventModalOverlay.classList.add('show'); // Show the modal
-        }
-
-        function openAddEventModal(dayDate) {
-            modalTitle.textContent = "Ajouter un événement";
-            modalEventDate.value = dayDate; // Pre-fill the date for the new event
-            modalEventStartTime.value = '';
-            modalEventEndTime.value = '';
-            modalEventSubject.value = '';
-            editingEventId.value = ''; // Clear editing ID for new event
-            editingEventDay.value = dayDate; // Set the day for the new event
-
-            eventModalOverlay.classList.add('show'); // Show the modal
-        }
-
-        function closeEventModal() {
-            eventModalOverlay.classList.remove('show'); // Hide the modal
-        }
-
-        // --- Packing List Management ---
-        const packingListItems = document.getElementById('packingListItems'); // Renamed from packingListContainer
-        const newItemInput = document.getElementById('newItemInput');
-        const addItemButton = document.getElementById('addItemButton'); // Renamed from addItemBtn
-        const packingListStatus = document.getElementById('packingListStatus');
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        const packingListAddControls = document.getElementById('packingListAddControls');
-
-
+        // Configure l'écouteur en temps réel pour la liste de colisage
         function setupPackingListListener() {
-            const q = query(packingListColRef, orderBy('createdAt')); // Order by creation time
+            // Utilisation de orderBy pour trier par createdAt, ce qui est recommandé pour les listes
+            const q = query(packingListColRef, orderBy('createdAt'));
             onSnapshot(q, (snapshot) => {
                 const items = [];
                 snapshot.forEach((doc) => {
@@ -1465,49 +947,35 @@
             });
         }
 
+        // Rend la liste de colisage dans l'interface utilisateur
         function renderPackingList(items) {
-            packingListItems.innerHTML = '';
+            packingListItems.innerHTML = ''; // Vide le conteneur existant
             if (items.length === 0) {
                 packingListItems.innerHTML = '<p class="text-center text-gray-500 p-4">Votre liste est vide. Ajoutez des éléments !</p>';
-                // No need to re-apply controls here, as enableAllControls will be called after this function
                 return;
             }
 
             items.forEach(item => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = `packing-list-item ${item.checked ? 'checked' : ''} bg-white hover:bg-gray-50`;
-                itemDiv.dataset.id = item.id;
+                itemDiv.dataset.id = item.id; // Stocke l'ID du document Firestore
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.className = 'checkbox-custom';
+                checkbox.id = `item-${item.id}`; // Utilise l'ID Firestore pour l'ID HTML
                 checkbox.checked = item.checked;
-                checkbox.addEventListener('change', () => {
-                    // Only allow toggling if unlocked
-                    if (unlockButton.classList.contains('hidden')) {
-                        toggleItem(item.id, item.checked);
-                    } else {
-                        // Revert checkbox state if locked
-                        checkbox.checked = !checkbox.checked;
-                        console.log("Interface verrouillée. Déverrouillez pour modifier la liste de colisage.");
-                    }
-                });
+                checkbox.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
+                checkbox.addEventListener('change', () => toggleItem(item.id, item.checked));
 
                 const label = document.createElement('label');
+                label.htmlFor = `item-${item.id}`;
                 label.textContent = item.text;
-                label.className = 'item-text';
 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-btn';
                 deleteButton.textContent = 'Supprimer';
-                deleteButton.addEventListener('click', () => {
-                    // Only allow deleting if unlocked
-                    if (unlockButton.classList.contains('hidden')) {
-                        deleteItem(item.id);
-                    } else {
-                        console.log("Interface verrouillée. Déverrouillez pour modifier la liste de colisage.");
-                    }
-                });
+                deleteButton.disabled = newItemInput.disabled; // L'état d'activation dépend du déverrouillage
+                deleteButton.addEventListener('click', () => deleteItem(item.id));
 
                 itemDiv.appendChild(checkbox);
                 itemDiv.appendChild(label);
@@ -1515,11 +983,10 @@
 
                 packingListItems.appendChild(itemDiv);
             });
-            packingListStatus.textContent = '';
-            // After rendering all items, apply the current lock state to them
-            enableAllControls(unlockButton.classList.contains('hidden'));
+            packingListStatus.textContent = ''; // Cache le statut de chargement si des éléments sont affichés
         }
 
+        // Ajoute un nouvel élément à la liste de colisage
         async function addItem() {
             const newItemText = newItemInput.value.trim();
             if (newItemText === '') {
@@ -1531,16 +998,16 @@
                 await addDoc(packingListColRef, {
                     text: newItemText,
                     checked: false,
-                    createdAt: serverTimestamp(),
+                    createdAt: serverTimestamp(), // Utilise le timestamp du serveur pour le tri
                     createdBy: userId
                 });
-                newItemInput.value = '';
+                newItemInput.value = ''; // Vide l'input après ajout
             } catch (error) {
                 console.error("Erreur lors de l'ajout de l'élément:", error);
-                alert("Erreur lors de l'ajout de l'élément. Veuillez réessayer.");
             }
         }
 
+        // Bascule l'état coché/décoché d'un élément de la liste de colisage
         async function toggleItem(itemId, currentCheckedStatus) {
             try {
                 await updateDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId), {
@@ -1548,66 +1015,28 @@
                 });
             } catch (error) {
                 console.error("Erreur lors de la mise à jour de l'élément:", error);
-                alert("Erreur lors de la mise à jour de l'élément. Veuillez réessayer.");
             }
         }
 
+        // Supprime un élément de la liste de colisage
         async function deleteItem(itemId) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer cet élément de la liste de colisage ?")) {
-                try {
-                    await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
-                } catch (error) {
-                    console.error("Erreur lors de la suppression de l'élément:", error);
-                    alert("Erreur lors de la suppression de l'élément. Veuillez réessayer.");
-                }
+            // Remplacer window.confirm par une logique de confirmation personnalisée ou un simple log pour le débogage
+            console.log("Tentative de suppression de l'élément:", itemId);
+            // Pour le moment, nous allons simuler la confirmation.
+            // Dans une vraie application, tu implémenterais une boîte de dialogue modale personnalisée ici.
+            // Par exemple, tu pourrais avoir un état `isDeleting` et afficher un message "Êtes-vous sûr ?"
+            // avant d'appeler deleteDoc.
+
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
+                console.log("Élément supprimé avec succès:", itemId);
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'élément:", error);
+                // Afficher un message d'erreur à l'utilisateur si nécessaire
             }
         }
 
-        // --- Event Listeners ---
-        // Toggle day content visibility
-        window.toggleDay = function(dayId) {
-            const content = document.getElementById(`content-${dayId}`);
-            const arrow = document.getElementById(`arrow-${dayId}`);
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                arrow.classList.add('rotated');
-            } else {
-                content.classList.add('hidden');
-                arrow.classList.remove('rotated');
-            }
-        };
-
-        // Password unlock/relock
-        unlockButton.addEventListener('click', () => {
-            if (passwordInput.value === MOCK_PASSWORD) {
-                enableAllControls(true);
-            } else {
-                passwordMessage.textContent = "Mot de passe incorrect.";
-                passwordMessage.classList.remove('hidden');
-            }
-        });
-        relockButton.addEventListener('click', reLockControls);
-
-        // Add event plus buttons (for planning events)
-        document.querySelectorAll('.add-event-plus-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const dayDate = e.target.dataset.dayTarget;
-                openAddEventModal(dayDate);
-            });
-        });
-
-        // Save event in modal
-        saveEventButton.addEventListener('click', savePlanningItem);
-
-        // Close event modal
-        closeEventModalBtn.addEventListener('click', closeEventModal);
-        eventModalOverlay.addEventListener('click', (e) => {
-            if (e.target === eventModalOverlay) {
-                closeEventModal();
-            }
-        });
-
-        // Packing list add item
+        // Événements pour ajouter un élément à la liste de colisage
         addItemButton.addEventListener('click', addItem);
         newItemInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !newItemInput.disabled) {
@@ -1615,13 +1044,13 @@
             }
         });
 
-        // --- Initial Load ---
+        // Appelle les fonctions au chargement de la page
         window.onload = function() {
-            startCountdown();
-            updateDayHighlight();
-            loadAllWeather();
-            initializeFirebase(); // Firebase initializes authentication and listeners
-            // enableAllControls(false) is called inside initializeFirebase after auth state is determined
+            startCountdown(); // Démarre le compte à rebours
+            updateDayHighlight(); // Met en évidence le jour actuel
+            loadAllWeather(); // Charge la météo
+            initializeFirebase(); // Initialise Firebase et toutes les fonctionnalités Firestore
+            enablePackingListEdit(false); // Désactive les contrôles par défaut
         };
     </script>
 </body>
