@@ -789,6 +789,9 @@
             <label for="modalEventSubject" class="block text-gray-700 text-sm font-bold mb-2 text-left">Objet de l'événement :</label>
             <input type="text" id="modalEventSubject" placeholder="Ex: Achat souvenirs" class="add-input w-full mb-4">
             
+            <label for="modalEventLink" class="block text-gray-700 text-sm font-bold mb-2 text-left">Lien (vidéo, info...) :</label>
+            <input type="url" id="modalEventLink" placeholder="Ex: https://youtube.com/watch?v=..." class="add-input w-full mb-4">
+
             <button id="saveEventButton" class="add-item-btn w-full">Ajouter l'événement</button>
             <input type="hidden" id="editingEventId"> <!-- Hidden field to store ID of event being edited -->
             <input type="hidden" id="editingEventDay"> <!-- Hidden field to store day of event being edited -->
@@ -1036,8 +1039,8 @@
                         console.log("Utilisateur connecté:", userId);
                         packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
                         eventsColRef = collection(db, `artifacts/${appId}/public/data/events`); // Initialize events collection
-                        setupPackingListListener();
-                        // Ensure data is populated before setting up listeners, but only if it's not already there
+                        await initializePackingListFromStaticData(); // Initialize packing list
+                        setupPackingListListener(); // Setup listener after potential initialization
                         await initializeEventsFromStaticData();
                         setupEventsListeners(); // Start listening for event changes
                         enableAllControls(false); // Ensure locked state on initial load
@@ -1126,6 +1129,7 @@
         const modalEventStartTime = document.getElementById('modalEventStartTime');
         const modalEventEndTime = document.getElementById('modalEventEndTime');
         const modalEventSubject = document.getElementById('modalEventSubject');
+        const modalEventLink = document.getElementById('modalEventLink'); // New link input
         const saveEventButton = document.getElementById('saveEventButton');
         const editingEventId = document.getElementById('editingEventId');
         const editingEventDay = document.getElementById('editingEventDay');
@@ -1138,7 +1142,7 @@
                 { startTime: '11:30', endTime: '12:30', subject: '🥪 Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.' },
                 { startTime: '12:30', endTime: '14:30', subject: '🛣️ Reprise du Trajet vers Colmar (environ 2h de route)' },
                 { startTime: '14:30', endTime: '15:00', subject: '🛎️ Arrivée à Colmar et Check-in à l\'Hôtel Primo' },
-                { startTime: '15:00', endTime: '17:00', subject: '🧸 Visite du Musée du Jouet de Colmar' },
+                { startTime: '15:00', endTime: '17:00', subject: '🧸 Visite du Musée du Jouet de Colmar', link: 'https://www.youtube.com/watch?v=your_colmar_toy_museum_video' },
                 { startTime: '17:00', endTime: '19:00', subject: '🚶‍♀️ Balade dans la Petite Venise et le centre historique' },
                 { startTime: '19:00', endTime: '21:00', subject: '🍽️ Dîner à Colmar' },
                 { startTime: '21:00', endTime: '23:00', subject: '😴 Retour à l\'hôtel et Nuit' },
@@ -1146,32 +1150,32 @@
             '2025-07-21': [
                 { startTime: '09:00', endTime: '10:00', subject: '☕ Lever et Petit-déjeuner à l\'Hôtel Primo Colmar, puis check-out.' },
                 { startTime: '10:00', endTime: '10:40', subject: '🛣️ Route de Colmar au Château du Haut-Kœnigsbourg (environ 40 min de route)' },
-                { startTime: '10:40', endTime: '12:40', subject: '⚔️ Visite du Château du Haut-Kœnigsbourg (environ 2 heures)' },
+                { startTime: '10:40', endTime: '12:40', subject: '⚔️ Visite du Château du Haut-Kœnigsbourg (environ 2 heures)', link: 'https://www.youtube.com/watch?v=f2wN64j-O7c' },
                 { startTime: '12:40', endTime: '13:40', subject: '🍔 Déjeuner (Pique-nique ou restauration rapide/simple)' },
                 { startTime: '13:40', endTime: '14:40', subject: '🎢 Route du Château du Haut-Kœnigsbourg à Europa-Park (Rust) (environ 1h de route)' },
                 { startTime: '15:30', endTime: '15:30', subject: '🛎️ Arrivée à l\'hôtel El Andaluz et Check-in' },
                 { startTime: '17:00', endTime: '23:00', subject: '🌙 Installation et Détente à l\'hôtel El Andaluz. Dîner et nuit sur place.' },
             ],
             '2025-07-22': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎉 Journée complète à Europa-Park. Profitez des attractions et spectacles !' }
+                { startTime: '09:00', endTime: '22:00', subject: '🎉 Journée complète à Europa-Park. Profitez des attractions et spectacles !', link: 'https://www.youtube.com/watch?v=your_europapark_video' }
             ],
             '2025-07-23': [
-                { startTime: '09:00', endTime: '22:00', subject: '🎢 Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.' }
+                { startTime: '09:00', endTime: '22:00', subject: '🎢 Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.', link: 'https://www.youtube.com/watch?v=your_europapark_video_2' }
             ],
             '2025-07-24': [
-                { startTime: '10:00', endTime: '19:00', subject: '🏊‍♀️ Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.' }
+                { startTime: '10:00', endTime: '19:00', subject: '🏊‍♀️ Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.', link: 'https://www.youtube.com/watch?v=your_rulantica_video' }
             ],
             '2025-07-25': [
-                { startTime: '09:00', endTime: '15:00', subject: '✨ Dernière matinée à Europa-Park. Profitez des attractions favorites.' },
+                { startTime: '09:00', endTime: '15:00', subject: '✨ Dernière matinée à Europa-Park. Profitez des attractions favorites.', link: 'https://www.youtube.com/watch?v=your_europapark_video_3' },
                 { startTime: '15:00', endTime: '16:00', subject: '🛣️ Départ d\'Europa-Park vers Lingolsheim (environ 50 min - 1h de route).' },
                 { startTime: '16:00', endTime: '22:00', subject: '🛌 Arrivée et installation à l\'Hôtel Campanile Strasbourg - Lingolsheim. Dîner et première nuit sur place.' }
             ],
             '2025-07-26': [
                 { startTime: '08:30', endTime: '09:30', subject: '🥐 Lever et Petit-déjeuner à l\'hôtel.' },
                 { startTime: '09:30', endTime: '10:00', subject: '🚌 Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min).' },
-                { startTime: '10:00', endTime: '12:00', subject: '⛪ Visite de la Cathédrale Notre-Dame de Strasbourg.' },
+                { startTime: '10:00', endTime: '12:00', subject: '⛪ Visite de la Cathédrale Notre-Dame de Strasbourg.', link: 'https://www.youtube.com/watch?v=your_strasbourg_cathedral_video' },
                 { startTime: '12:00', endTime: '14:00', subject: '🍔 Déjeuner (Pique-nique ou boulangerie/sandwicherie).' },
-                { startTime: '14:00', endTime: '15:30', subject: '🛥️ Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).' },
+                { startTime: '14:00', endTime: '15:30', subject: '🛥️ Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).', link: 'https://www.youtube.com/watch?v=your_batorama_video' },
                 { startTime: '15:30', endTime: '17:30', subject: '🏘️ Balade dans la Petite France et les Ponts Couverts.' },
                 { startTime: '17:30', endTime: '18:30', subject: '🌳 Détente au Parc de l\'Orangerie (optionnel).' },
                 { startTime: '19:00', endTime: '21:00', subject: '🍕 Dîner à Strasbourg.' },
@@ -1182,7 +1186,7 @@
                 { startTime: '09:00', endTime: '09:30', subject: '🎒 Préparation et Check-out de l\'hôtel.' },
                 { startTime: '09:30', endTime: '13:00', subject: '🛣️ Trajet de Lingolsheim à Salins-les-Bains (environ 3h30 de route).' },
                 { startTime: '13:00', endTime: '14:00', subject: '🍽️ Déjeuner à Salins-les-Bains.' },
-                { startTime: '14:00', endTime: '16:00', subject: '🧂 Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).' },
+                { startTime: '14:00', endTime: '16:00', subject: '🧂 Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).', link: 'https://www.youtube.com/watch?v=your_salines_video' },
                 { startTime: '16:00', endTime: '18:00', subject: '🚗 Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).' },
                 { startTime: '18:00', endTime: '18:00', subject: '🏠 Arrivée à votre domicile. Fin des vacances !' }
             ]
@@ -1208,6 +1212,7 @@
                                 startTime: event.startTime,
                                 endTime: event.endTime || '',
                                 subject: event.subject,
+                                link: event.link || '', // Save the link
                                 order: order++,
                                 createdAt: serverTimestamp(),
                                 createdBy: userId
@@ -1281,9 +1286,15 @@
                     timeDisplay += ` - ${item.endTime}`;
                 }
 
+                let linkHtml = '';
+                if (item.link) {
+                    linkHtml = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:underline ml-2 text-sm">🔗 Lien</a>`;
+                }
+
                 itemDiv.innerHTML = `
                     <span class="time">${timeDisplay} :</span> 
                     <span>${item.subject}</span>
+                    ${linkHtml}
                     <button class="delete-btn ml-auto">Supprimer</button>
                 `;
 
@@ -1313,6 +1324,7 @@
             const startTime = modalEventStartTime.value;
             const endTime = modalEventEndTime.value;
             const subject = modalEventSubject.value.trim();
+            const link = modalEventLink.value.trim(); // Get the link
             const idToEdit = editingEventId.value;
 
             if (!day || !startTime || !subject) {
@@ -1326,7 +1338,8 @@
                     await updateDoc(doc(db, `artifacts/${appId}/public/data/events`, idToEdit), {
                         startTime: startTime,
                         endTime: endTime,
-                        subject: subject
+                        subject: subject,
+                        link: link // Save the link
                     });
                     console.log("Événement mis à jour:", idToEdit);
                 } else {
@@ -1335,6 +1348,7 @@
                         startTime: startTime,
                         endTime: endTime,
                         subject: subject,
+                        link: link, // Save the link
                         createdAt: serverTimestamp(),
                         createdBy: userId
                     });
@@ -1366,25 +1380,26 @@
                 return;
             }
 
-            const timeSpan = itemDiv.querySelector('.time');
-            const subjectSpan = itemDiv.querySelector('span:nth-child(2)');
-
-            const timeText = timeSpan.textContent.replace(' :', '').trim();
-            const timeParts = timeText.split(' - ');
-
-            const startTime = timeParts[0];
-            const endTime = timeParts.length > 1 ? timeParts[1] : '';
-            const subject = subjectSpan.textContent.trim();
-
-            modalTitle.textContent = "Modifier l'événement";
-            modalEventDate.value = dayDate;
-            modalEventStartTime.value = startTime;
-            modalEventEndTime.value = endTime;
-            modalEventSubject.value = subject;
-            editingEventId.value = itemId;
-            editingEventDay.value = dayDate;
-
-            eventModalOverlay.classList.add('show');
+            // Fetch the actual data from Firestore to get the link
+            const eventRef = doc(db, `artifacts/${appId}/public/data/events`, itemId);
+            getDoc(eventRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    const item = docSnap.data();
+                    modalTitle.textContent = "Modifier l'événement";
+                    modalEventDate.value = dayDate;
+                    modalEventStartTime.value = item.startTime;
+                    modalEventEndTime.value = item.endTime || '';
+                    modalEventSubject.value = item.subject;
+                    modalEventLink.value = item.link || ''; // Populate the link
+                    editingEventId.value = itemId;
+                    editingEventDay.value = dayDate;
+                    eventModalOverlay.classList.add('show');
+                } else {
+                    console.error("Aucun document trouvé pour l'ID:", itemId);
+                }
+            }).catch(error => {
+                console.error("Erreur lors de la récupération du document pour édition:", error);
+            });
         }
 
         function openAddEventModal(dayDate) {
@@ -1393,6 +1408,7 @@
             modalEventStartTime.value = '';
             modalEventEndTime.value = '';
             modalEventSubject.value = '';
+            modalEventLink.value = ''; // Clear the link field
             editingEventId.value = '';
             editingEventDay.value = dayDate;
 
@@ -1411,6 +1427,122 @@
         const userIdDisplay = document.getElementById('userIdDisplay');
         const packingListAddControls = document.getElementById('packingListAddControls');
 
+        const defaultPackingList = [
+            // Documents et Argent
+            { text: 'Passeports / Cartes d\'identité', checked: false },
+            { text: 'Billets (train, avion, parcs)', checked: false },
+            { text: 'Permis de conduire', checked: false },
+            { text: 'Cartes de crédit / Argent liquide', checked: false },
+            { text: 'Assurance voyage', checked: false },
+            { text: 'Copies des documents importants (numérique et papier)', checked: false },
+            { text: 'Carnet de santé / Ordonnances', checked: false },
+
+            // Vêtements (pour 7 jours + parc aquatique)
+            { text: 'Sous-vêtements (x7-8)', checked: false },
+            { text: 'Chaussettes (x7-8)', checked: false },
+            { text: 'T-shirts / Hauts (x7-8)', checked: false },
+            { text: 'Pantalons / Shorts (x3-4)', checked: false },
+            { text: 'Robes / Jupes (si applicable)', checked: false },
+            { text: 'Maillots de bain (x2 par personne pour Rulantica)', checked: false },
+            { text: 'Serviettes de bain (pour Rulantica, si non fournies)', checked: false },
+            { text: 'Pyjamas', checked: false },
+            { text: 'Veste légère / Gilet', checked: false },
+            { text: 'Imperméable / K-Way (très utile à Europa-Park)', checked: false },
+            { text: 'Pull / Sweat (soirées fraîches)', checked: false },
+            { text: 'Chaussures confortables de marche (indispensable pour les parcs)', checked: false },
+            { text: 'Sandales / Tongs (pour Rulantica et détente)', checked: false },
+            { text: 'Chapeau / Casquette', checked: false },
+            { text: 'Lunettes de soleil', checked: false },
+
+            // Trousse de toilette
+            { text: 'Brosse à dents et dentifrice', checked: false },
+            { text: 'Shampoing et après-shampoing', checked: false },
+            { text: 'Gel douche / Savon', checked: false },
+            { text: 'Crème solaire (indispensable !)', checked: false },
+            { text: 'Après-soleil', checked: false },
+            { text: 'Déodorant', checked: false },
+            { text: 'Brosse à cheveux / Peigne', checked: false },
+            { text: 'Maquillage (si applicable)', checked: false },
+            { text: 'Produits pour les cheveux (gel, laque...)', checked: false },
+            { text: 'Rasoir et crème à raser', checked: false },
+            { text: 'Lentilles de contact et produits (si applicable)', checked: false },
+            { text: 'Petite trousse de premiers secours (pansements, désinfectant, antidouleur)', checked: false },
+            { text: 'Lingettes désinfectantes / Gel hydroalcoolique', checked: false },
+            { text: 'Mouchoirs', checked: false },
+            { text: 'Baume à lèvres', checked: false },
+            { text: 'Répulsif moustiques', checked: false },
+
+            // Électronique
+            { text: 'Téléphones portables et chargeurs', checked: false },
+            { text: 'Batterie externe / Power bank', checked: false },
+            { text: 'Appareil photo et cartes mémoire', checked: false },
+            { text: 'Adaptateur de prise (si nécessaire pour l\'Allemagne)', checked: false },
+            { text: 'Tablette / Ordinateur portable (si besoin)', checked: false },
+            { text: 'Écouteurs', checked: false },
+
+            // Pour les enfants
+            { text: 'Jouets / Livres / Activités pour le voyage', checked: false },
+            { text: 'Doudous / Objets de confort', checked: false },
+            { text: 'Petits sacs à dos pour les parcs', checked: false },
+            { text: 'Snacks et gourdes réutilisables', checked: false },
+            { text: 'Lingettes bébé (même pour les grands, ça dépanne !)', checked: false },
+            { text: 'Couches (si applicable)', checked: false },
+            { text: 'Poussette / Porte-bébé (si applicable)', checked: false },
+
+            // Divers
+            { text: 'Petit sac à dos pour les excursions journalières', checked: false },
+            { text: 'Gourde réutilisable', checked: false },
+            { text: 'Sacs réutilisables pour les courses / souvenirs', checked: false },
+            { text: 'Petit parapluie', checked: false },
+            { text: 'Coussin de voyage (pour la voiture)', checked: false },
+            { text: 'Couverture légère (pour la voiture)', checked: false },
+            { text: 'Snacks pour la route', checked: false },
+            { text: 'Bouteilles d\'eau', checked: false },
+            { text: 'Petite glacière', checked: false },
+            { text: 'Sacs poubelle (pour la voiture)', checked: false },
+            { text: 'Chargeurs de téléphone pour voiture', checked: false },
+            { text: 'Musique / Podcasts / Livres audio pour la route', checked: false },
+            { text: 'Jeu de cartes / Petits jeux de société', checked: false },
+            { text: 'Crayon et papier', checked: false },
+            { text: 'Masque de nuit et bouchons d\'oreilles', checked: false },
+            { text: 'Petit cadenas (pour casier à Rulantica si besoin)', checked: false },
+            { text: 'Sacs à linge sale', checked: false },
+            { text: 'Sacs de congélation (pour organiser les affaires)', checked: false },
+            { text: 'Couteau suisse (attention aux règles de sécurité)', checked: false },
+            { text: 'Ouvre-bouteille / Tire-bouchon', checked: false },
+            { text: 'Petite lampe de poche', checked: false },
+            { text: 'Kit de couture de voyage', checked: false },
+            { text: 'Petits cadeaux / souvenirs pour la famille / amis', checked: false },
+            { text: 'Matériel de lecture (livres, magazines)', checked: false },
+            { text: 'Carnet de voyage / Journal', checked: false },
+            { text: 'Stylo', checked: false },
+            { text: 'Pince à linge et petite corde (pour sécher maillots)', checked: false }
+        ];
+
+        async function initializePackingListFromStaticData() {
+            console.log("Début de l'initialisation de la liste de colisage.");
+            const existingItemsSnapshot = await getDocs(packingListColRef);
+            const existingItemsText = new Set(existingItemsSnapshot.docs.map(doc => doc.data().text));
+
+            for (const item of defaultPackingList) {
+                if (!existingItemsText.has(item.text)) {
+                    try {
+                        await addDoc(packingListColRef, {
+                            text: item.text,
+                            checked: item.checked,
+                            createdAt: serverTimestamp(),
+                            createdBy: userId
+                        });
+                        console.log("Ajouté élément de colisage par défaut:", item.text);
+                    } catch (error) {
+                        console.error("Erreur lors de l'ajout de l'élément de colisage statique:", item.text, error);
+                    }
+                } else {
+                    console.log("L'élément de colisage existe déjà:", item.text);
+                }
+            }
+            console.log("Fin de l'initialisation de la liste de colisage.");
+        }
 
         function setupPackingListListener() {
             const q = query(packingListColRef, orderBy('createdAt'));
