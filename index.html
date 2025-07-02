@@ -833,6 +833,7 @@
         const unlockButton = document.getElementById('unlockButton');
         const relockButton = document.getElementById('relockButton');
         const passwordMessage = document.getElementById('passwordMessage');
+        // Removed offlineIndicator as per user request
 
         let db;
         let auth;
@@ -840,6 +841,9 @@
         let appId;
         let packingListColRef;
         let eventsColRef;
+
+        // Removed Service Worker Registration as per user request
+        // Removed Online/Offline Status Listener as per user request
 
         // --- Countdown Logic ---
         const vacationStartDate = new Date('2025-07-20T09:30:00');
@@ -908,8 +912,11 @@
 
         // --- Météo en temps réel via OpenWeatherMap ---
         const weatherDisplay = document.getElementById('weatherDisplay');
+        // Removed weatherOfflineMessage as per user request
 
         async function fetchWeatherData(city) {
+            // Removed navigator.onLine check as per user request
+
             const currentWeatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
             const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
 
@@ -989,6 +996,8 @@
         }
 
         async function loadAllWeather() {
+            // Removed navigator.onLine check and weatherOfflineMessage logic as per user request
+
             const cities = [
                 { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
                 { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' },
@@ -1737,7 +1746,7 @@
         window.onload = function() {
             startCountdown();
             updateDayHighlight();
-            loadAllWeather();
+            loadAllWeather(); // Initial load of weather
             initializeFirebase();
         };
     </script>
