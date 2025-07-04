@@ -631,6 +631,12 @@
             <div id="content-summary-weather" class="p-4 hidden">
                 <div id="weatherDisplay" class="text-gray-800 text-left">
                     <ul class="list-disc list-inside space-y-2 text-gray-800">
+                        <li><span class="font-semibold">Charvieu-Chavagneux :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-charvieu-today">Chargement...</span><br>
+                                Demain : <span id="weather-charvieu-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
                         <li><span class="font-semibold">Colmar :</span>
                             <div class="ml-4">
                                 Aujourd'hui : <span id="weather-colmar-today">Chargement...</span><br>
@@ -1038,6 +1044,7 @@
 
         async function loadAllWeather() {
             const cities = [
+                { name: 'Charvieu-Chavagneux', todayId: 'weather-charvieu-today', tomorrowId: 'weather-charvieu-tomorrow' }, // Ajout de Charvieu-Chavagneux
                 { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
                 { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' },
                 { name: 'Strasbourg', todayId: 'weather-strasbourg-today', tomorrowId: 'weather-strasbourg-tomorrow' },
