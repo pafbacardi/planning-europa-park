@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning des Vacances en Famille</title>
+        <!-- Favicon  -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎒</text></svg>">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Définition du motif SVG pour le fond du CONTENEUR PRINCIPAL */
+        .subtle-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6' cy='6' r='1.5' fill='%23e0f2f7' fill-opacity='0.15'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-attachment: scroll;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Fond gris clair pour le body */
+            /* Padding ajusté pour mieux utiliser la largeur sur mobile */
+            padding: 0.5rem; /* p-2 equivalent */
+        }
+        /* Tailwind responsive classes will override this for larger screens */
+        @media (min-width: 640px) { /* sm */
+            body {
+                padding: 1rem; /* p-4 equivalent */
+            }
+        }
+        @media (min-width: 768px) { /* md */
+            body {
+                padding: 2rem; /* p-8 equivalent */
+            }
+        }
+
+        .rotated {
+            transform: rotate(180deg);
+        }
+
+        /* Styles pour le compte à rebours - Plus discret et sur une seule ligne */
+        .countdown-container {
+            background-color: #f8fafc; /* Very light blue/almost white */
+            border: 1px solid #bfdbfe; /* Light blue border */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 0.75rem 1rem; /* Adjusted padding */
+            margin-bottom: 1.5rem; /* Reduced margin */
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* subtle shadow */
+            display: flex; /* Use flexbox for horizontal alignment */
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow wrapping on very small screens */
+        }
+        .countdown-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* semi-bold */
+            color: #1e40af; /* Blue-700 */
+            margin-right: 0.75rem; /* Space between title and time */
+            white-space: nowrap; /* Keep title on one line */
+        }
+        .countdown-time {
+            font-size: 1.5rem; /* Adjusted font size for single line */
+            font-weight: 800; /* extrabold */
+            color: #1d4ed8; /* Blue-800 */
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem; /* Reduced gap between units */
+            flex-wrap: wrap; /* Allow wrapping on very small screens */
+        }
+        .countdown-unit {
+            display: flex;
+            align-items: baseline; /* Align values and labels nicely */
+        }
+        .countdown-value {
+            font-size: 1.5rem; /* Adjusted font size */
+            line-height: 1;
+        }
+        .countdown-label {
+            font-size: 0.625rem; /* text-xs */
+            color: #6b7280; /* Gray-500 */
+            text-transform: uppercase;
+            margin-left: 0.2rem; /* Space between value and label */
+            white-space: nowrap; /* Prevent label from wrapping */
+        }
+        /* Responsive adjustments for countdown */
+        @media (max-width: 640px) {
+            .countdown-container {
+                flex-direction: column;
+                padding: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .countdown-title {
+                margin-right: 0;
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+            }
+            .countdown-time {
+                font-size: 1.2rem;
+                gap: 0.3rem;
+            }
+            .countdown-value {
+                font-size: 1.2rem;
+            }
+            .countdown-label {
+                font-size: 0.5rem;
+            }
+        }
+
+        /* Style pour le jour actuel */
+        .highlight-today {
+            background-color: #d1fae5; /* Light green for highlight */
+            border: 2px solid #10b981; /* Green border */
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); /* Green shadow */
+        }
+
+        /* Styles pour le conteneur principal avec motif */
+        .main-container {
+            background-color: transparent; /* Rendre le fond du conteneur transparent pour voir le motif */
+            color: #333;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            /* Padding sera géré par les classes Tailwind directement sur la div */
+            /* text-align: center; -- REMOVED THIS LINE */
+        }
+
+        /* Styles pour le planning et les événements */
+        .day-section {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .day-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 1rem;
+            display: flex; /* Added for speaker icon alignment */
+            align-items: center; /* Added for speaker icon alignment */
+            justify-content: space-between; /* Added for speaker icon alignment */
+        }
+        .planning-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            transition: background-color 0.2s;
+            padding: 0.25rem 0;
+            cursor: default; /* Default to not clickable */
+            pointer-events: none; /* Default to not clickable for editing */
+        }
+        /* Override for links within planning items to always be clickable */
+        .planning-item a {
+            pointer-events: auto; /* Allow clicks on links inside planning items */
+            cursor: pointer; /* Ensure link cursor is a pointer */
+        }
+        .planning-item.unlocked:hover { /* Only hover effect when unlocked */
+            background-color: #e2e8f0;
+        }
+        .planning-item.unlocked { /* Only clickable for editing when unlocked */
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .planning-item .time {
+            font-weight: 600;
+            min-width: 80px;
+        }
+        .planning-item .delete-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-left: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+        .planning-item .delete-btn:hover {
+            background-color: #dc2626;
+        }
+        .add-event-plus-btn {
+            background-color: #10b981;
+            color: white;
+            border-radius: 9999px;
+            width: 48px;
+            height: 48px;
+            font-size: 2rem;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s;
+            margin: 1.5rem auto 0.5rem auto;
+        }
+        .add-event-plus-btn:hover {
+            background-color: #059669;
+            transform: scale(1.05);
+        }
+
+        /* Password Controls */
+        .password-controls {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+        .password-input {
+            flex-grow: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            min-width: 150px; /* Ensure input doesn't shrink too much */
+        }
+        .password-unlock-btn, .password-relock-btn { /* Apply styles to both buttons */
+            flex-shrink: 0; /* Prevent buttons from shrinking */
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap; /* Prevent button text from wrapping */
+        }
+        .password-unlock-btn {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .password-unlock-btn:hover {
+            background-color: #2563eb;
+        }
+        .password-relock-btn {
+            background-color: #6b7280;
+            color: white;
+            display: none; /* Hidden by default */
+        }
+        .password-relock-btn:hover {
+            background-color: #4b5563;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .modal-close-btn:hover {
+            color: #374151;
+        }
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        @media (min-width: 640px) {
+            .modal-form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .modal-form-grid label {
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.25rem;
+            display: block;
+            font-size: 0.875rem;
+        }
+        .modal-form-grid input {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+        }
+
+        /* Styles pour la liste de colisage */
+        .packing-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+        }
+        .packing-list-item:last-child {
+            border-bottom: none;
+        }
+        .packing-list-item input[type="checkbox"] {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: #3b82f6; /* Blue-500 */
+        }
+        .packing-list-item label {
+            flex-grow: 1;
+            font-size: 1rem;
+            color: #374151; /* Gray-700 */
+            cursor: pointer;
+        }
+        .packing-list-item input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #6b7280; /* Gray-500 */
+        }
+        .packing-list-item .delete-btn {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-left: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+        .packing-list-item .delete-btn:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        .add-item-input {
+            border: 1px solid #d1d5db; /* Gray-300 */
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+        .add-item-btn {
+            background-color: #22c55e; /* Green-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .add-item-btn:hover {
+            background-color: #16a34a; /* Green-600 */
+        }
+        /* Controls for packing list add/edit */
+        #packingListAddControls input, #packingListAddControls button {
+            pointer-events: none; /* Disabled by default */
+            opacity: 0.6;
+        }
+        #packingListAddControls.unlocked input, #packingListAddControls.unlocked button {
+            pointer-events: auto;
+            opacity: 1;
+        }
+        .speaker-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: white;
+            margin-left: 0.5rem;
+            padding: 0;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        .speaker-button:hover {
+            transform: scale(1.1);
+        }
+        .speaker-button.speaking {
+            color: #fcd34d; /* Yellow-300 */
+        }
+
+        /* Styles pour le lien de l'album photo et le bouton vidéo */
+        .media-link-group {
+            display: flex;
+            flex-wrap: wrap; /* Permet aux éléments de passer à la ligne sur les petits écrans */
+            justify-content: center;
+            gap: 1rem; /* Espace entre les boutons */
+            margin-top: 1.5rem; /* mt-6 */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+
+        .media-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3490dc; /* Couleur bleue de Tailwind */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            white-space: nowrap; /* Empêche le texte de se casser */
+        }
+
+        .media-link:hover {
+            background-color: #2779bd; /* Bleu plus foncé au survol */
+        }
+
+        .media-link span.text-2xl {
+            line-height: 1; /* Assure que l'emoji est bien aligné */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="main-container max-w-4xl mx-auto subtle-pattern">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-8">
+            ✈️ Programme des Vacances été 2025 👨‍👩‍👧‍👦
+        </h1>
+
+        <p class="text-center text-gray-700 mb-8 text-lg">
+            Dimanche 20 juillet au Dimanche 27 juillet
+        </p>
+
+        <!-- Nouvelle Section: Compte à Rebours avant les Vacances -->
+        <div class="countdown-container">
+            <div class="countdown-title">Départ dans :</div>
+            <div id="countdown" class="countdown-time">
+                <!-- Le compte à rebours sera affiché ici -->
+            </div>
+        </div>
+
+        <!-- Section: Liens médias (Album Photo & Vidéo Chanson) -->
+        <div class="media-link-group">
+            <a href="https://photos.app.goo.gl/Zbd8der8QQQzoTdH7" target="_blank" class="media-link">
+                <span class="text-2xl">📷</span> <!-- Emoji appareil photo -->
+                <span class="ml-2">Photos</span>
+            </a>
+            <a href="https://github.com/pafbacardi/planning-europa-park/raw/main/Le-carnet-de-nos-souvenirs.mp4" target="_blank" class="media-link">
+                <span class="text-2xl">🎵</span> <!-- Emoji note de musique -->
+                <span class="ml-2">Chanson</span>
+            </a>
+        </div>
+
+
+        <!-- Phase 1: Aller en Alsace et Arrivée à Europa-Park -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2 text-left">
+            🗺️ Phase 1 : L'aller en Alsace et Arrivée à Europa-Park
+        </h2>
+
+        <!-- Jour 1 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-20">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day1')">
+                <h3 class="text-xl font-semibold">
+                    <span>🏡 Jour 1 (Dimanche 20 juillet) : De Charvieu-Chavagneux à Colmar</span>
+                    <button class="speaker-button" data-day-date="2025-07-20" onclick="event.stopPropagation(); speakDaySummary('2025-07-20', this)">🔊</button>
+                </h3>
+                <span id="arrow-day1" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day1" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-20" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://www.civitatis.com/f/francia/colmar/pass-alsace-589x392.jpg" alt="Petite Venise Colmar" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-20" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Jour 2 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-21">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day2')">
+                <h3 class="text-xl font-semibold">
+                    <span>🏰 Jour 2 (Lundi 21 juillet) : De Colmar au Château du Haut-Kœnigsbourg et Arrivée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-21" onclick="event.stopPropagation(); speakDaySummary('2025-07-21', this)">🔊</button>
+                </h3>
+                <span id="arrow-day2" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day2" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-21" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/2b/14/6c/vue-aerienne-du-chateau.jpg?w=900&h=500&s=1" alt="Château du Haut-Kœnigsbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-21" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Phase 2: Séjour à Europa-Park et Rulantica -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2 text-left">
+            🎢 Phase 2 : Séjour à Europa-Park et Rulantica
+        </h2>
+
+        <!-- Nouveau bouton "Notes des attractions" -->
+        <div class="media-link-group">
+            <a href="https://pafbacardi.github.io/notes-europapark/synth%C3%A8se%20notes%20EP.html" target="_blank" class="media-link" style="background-color: #facc15; /* bg-yellow-400 */">
+                <span class="text-2xl">📊</span> <!-- Emoji graphique -->
+                <span class="ml-2">Notes des attractions</span>
+            </a>
+        </div>
+
+        <!-- Jour 3 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-22">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day3')">
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 3 (Mardi 22 juillet) : Journée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-22" onclick="event.stopPropagation(); speakDaySummary('2025-07-22', this)">🔊</button>
+                </h3>
+                <span id="arrow-day3" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day3" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-22" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_267,q_40,w_400/hotelier-images/2b/eb/ed58339cacae9fda06a7fc04792d1d63adcec85bfa38071eeb3fdc395a96.jpeg" alt="Europa-Park" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-22" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Jour 4 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-23">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day4')">
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 4 (Mercredi 23 juillet) : Journée à Europa-Park</span>
+                    <button class="speaker-button" data-day-date="2025-07-23" onclick="event.stopPropagation(); speakDaySummary('2025-07-23', this)">🔊</button>
+                </h3>
+                <span id="arrow-day4" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day4" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-23" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://restaurant-musculus.fr/wp-content/uploads/2010/08/Europapark.jpg" alt="Attractions Europa-Park" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-23" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Jour 5 (Rulantica) -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-24">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day5')">
+                <h3 class="text-xl font-semibold">
+                    <span>🌊 Jour 5 (Jeudi 24 juillet) : Journée à Rulantica</span>
+                    <button class="speaker-button" data-day-date="2025-07-24" onclick="event.stopPropagation(); speakDaySummary('2025-07-24', this)">🔊</button>
+                </h3>
+                <span id="arrow-day5" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day5" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-24" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://www.ambassadeurs.alsace/sites/ambassadeurs/files/xep19_va_020_rulantica_motiv_vorlagen_picturepark_dina5_quer_fr-1_113861.jpg.pagespeed.ic.La2ql5hnyK.jpg" alt="Parc aquatique Rulantica" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-24" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Jour 6 (Europa-Park et Retour) -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-25">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day6')">
+                <h3 class="text-xl font-semibold">
+                    <span>🎡 Jour 6 (Vendredi 25 juillet) : Europa-Park et départ vers Strasbourg</span>
+                    <button class="speaker-button" data-day-date="2025-07-25" onclick="event.stopPropagation(); speakDaySummary('2025-07-25', this)">🔊</button>
+                </h3>
+                <span id="arrow-day6" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day6" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-25" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://s3.travel-cdn.net/pictures/65500/gallery_hd.jpg?rev=3" alt="Vue d'Europa-Park" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-25" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Phase 3: Le Retour via Strasbourg et le Jura -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-blue-700 mb-6 border-b-2 border-blue-300 pb-2 text-left">
+            🚗 Phase 3 : Le Retour via Strasbourg et le Jura
+        </h2>
+
+        <!-- Jour 7 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-26">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day7')">
+                <h3 class="text-xl font-semibold">
+                    <span>🏛️ Jour 7 (Samedi 26 juillet) : Journée complète à Strasbourg</span>
+                    <button class="speaker-button" data-day-date="2025-07-26" onclick="event.stopPropagation(); speakDaySummary('2025-07-26', this)">🔊</button>
+                </h3>
+                <span id="arrow-day7" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day7" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-26" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://www.vinci-autoroutes.com/static/81d12a3bf141348d9b425be379bbf420/cathedrale-strasbourg-idee-sortie-vinci-autoroutes.jpg" alt="Cathédrale Notre-Dame de Strasbourg" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-26" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Jour 8 -->
+        <div class="mb-4 bg-white rounded-lg shadow-md overflow-hidden day-section" data-day-date="2025-07-27">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-500 text-white rounded-t-lg" onclick="toggleDay('day8')">
+                <h3 class="text-xl font-semibold">
+                    <span>🏞️ Jour 8 (Dimanche 27 juillet) : De Lingolsheim (Strasbourg) via Salins-les-Bains à Charvieu-Chavagneux</span>
+                    <button class="speaker-button" data-day-date="2025-07-27" onclick="event.stopPropagation(); speakDaySummary('2025-07-27', this)">🔊</button>
+                </h3>
+                <span id="arrow-day8" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-day8" class="p-4 hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <!-- Contenu du planning (à gauche) -->
+                    <div id="planningContent-2025-07-27" class="space-y-2 text-gray-800 w-full md:w-1/2 text-left">
+                        <p class="text-center text-gray-500">Chargement des événements...</p>
+                    </div>
+                    <!-- Image (à droite) -->
+                    <div class="w-full md:w-1/2 flex justify-center items-center p-2">
+                        <img src="https://www.archeologie-et-histoire-morestel.fr/wp-content/uploads/2021/06/BANDEAU-SALINE-15-JUILLET-2021.jpg" alt="Grandes Salines de Salins-les-Bains" class="rounded-lg shadow-lg max-h-60 object-cover w-full">
+                    </div>
+                </div>
+                <button class="add-event-plus-btn" data-day-target="2025-07-27" disabled>+</button>
+            </div>
+        </div>
+
+        <!-- Section Météo Actuelle (Simulation) -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-weather')">
+                <h2 class="text-2xl sm:text-3xl font-bold">☀️ Météo en direct</h2>
+                <span id="arrow-summary-weather" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-weather" class="p-4 hidden">
+                <div id="weatherDisplay" class="text-gray-800 text-left">
+                    <ul class="list-disc list-inside space-y-2 text-gray-800">
+                        <li><span class="font-semibold">Colmar :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-colmar-today">Chargement...</span><br>
+                                Demain : <span id="weather-colmar-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Europa-Park / Rust :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-rust-today">Chargement...</span><br>
+                                Demain : <span id="weather-rust-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Strasbourg :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-strasbourg-today">Chargement...</span><br>
+                                Demain : <span id="weather-strasbourg-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                        <li><span class="font-semibold">Salins-les-Bains / Jura :</span>
+                            <div class="ml-4">
+                                Aujourd'hui : <span id="weather-salins-today">Chargement...</span><br>
+                                Demain : <span id="weather-salins-tomorrow">Chargement...</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Ces données sont des prévisions en temps quasi-réel via OpenWeatherMap.</p>
+            </div>
+        </div>
+
+        <!-- Résumé des Trajets et Temps de Route Estimés -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-10">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-trajets')">
+                <h2 class="text-2xl sm:text-3xl font-bold">⏱️ Résumé des Trajets et Temps de Route Estimés</h2>
+                <span id="arrow-summary-trajets" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-trajets" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800 text-left">
+                    <li class="font-semibold text-lg text-blue-600">Aller :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Charvieu-Chavagneux -> Colmar : ~4h (300 km) (avec 1h de pause repas incluse) (<a href="waze://?q=Colmar&navigate=yes&from=Charvieu-Chavagneux" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Colmar -> Château du Haut-Kœnigsbourg : ~40 min (45 km) (<a href="waze://?q=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Château du Haut-Kœnigsbourg -> Europa-Park (Rust) : ~1h (50 km) (<a href="waze://?q=Europa-Park%20Rust&navigate=yes&from=Ch%C3%A2teau%20du%20Haut-K%C5%93nigsbourg" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                    </ul>
+                    <li class="font-bold text-lg text-green-700 mt-4">Sous-total Aller : ~5h40 (395 km)</li>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Retour :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Europa-Park (Rust) -> Campanile Strasbourg - Lingolsheim : ~50 min - 1h (60 km) (<a href="waze://?q=Campanile%20Strasbourg%20Lingolsheim&navigate=yes&from=Europa-Park%20Rust" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Campanile Strasbourg - Lingolsheim -> Salins-les-Bains : ~3h15 - 3h45 (280 km) (<a href="waze://?q=Salins-les-Bains&navigate=yes&from=Campanile%20Strasbourg%20Lingolsheim" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                        <li>Salins-les-Bains -> Charvieu-Chavagneux : ~2h (170 km) (<a href="waze://?q=Charvieu-Chavagneux&navigate=yes&from=Salins-les-Bains" target="_blank" class="text-blue-600 hover:underline">Ouvrir dans Waze</a>)</li>
+                    </ul>
+                    <li class="font-bold text-lg text-green-700 mt-4">Sous-total Retour : ~6h30 (510 km)</li>
+                    <li class="font-bold text-lg text-blue-800 mt-4">Total Général : ~12h10 (905 km)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Budget Détaillé des Vacances -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-budget')">
+                <h2 class="text-2xl sm:text-3xl font-bold">💰 Budget Détaillé des Vacances (Estimations)</h2>
+                <span id="arrow-summary-budget" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-budget" class="p-4 hidden">
+                <ul class="list-disc list-inside space-y-2 text-gray-800 text-left">
+                    <li><span class="font-semibold">Séjour complet à Europa-Park (Hôtel El Andaluz + Billets Parcs) :</span> <span class="font-bold text-green-700">2083 €</span></li>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Coût estimé des escales (Nuits, Activités & Transport) :</li>
+                    <ul class="list-disc list-inside ml-4 space-y-1">
+                        <li><span class="font-semibold">Aller (1 nuit d'escale à Colmar) :</span>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Carburant (Jour 1 & 2) : 25€</li>
+                                <li>Péages (Jour 1 & 2) : 25€</li>
+                                <li>Musée du Jouet (Jour 1) : 25€</li>
+                                <li>Nuit Hôtel Primo (Jour 1) : 100€ (confirmé)</li>
+                                <li>Château Haut-Kœnigsbourg (Jour 2) : 20€</li>
+                            </ul>
+                            <span class="font-bold text-green-700">Sous-total Aller : 195 €</span>
+                        </li>
+                        <li class="mt-4"><span class="font-semibold">Retour (2 nuits d'escales à Strasbourg + activités/transport) :</span>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Carburant (Jour 6, 7 & 8) : 60€</li>
+                                <li>Péages (Jour 6, 7 & 8) : 40€</li>
+                                <li>Nuits Campanile (Jour 6 & 7) : 201€ (confirmé pour 2 nuits)</li>
+                                <li>Transports en commun Strasbourg (Jour 7) : 7,20 € (ALSA + Journée Groupe Groupe EMS à prendre sur place)</li>
+                                <li>Bateau-Mouche (Jour 7) : 52,30 € (confirmé)</li>
+                                <li>Grandes Salines (Jour 8) : 30€</li>
+                            </ul>
+                            <span class="font-bold text-green-700">Sous-total Retour : 390.50 €</span>
+                        </li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Total estimé pour toutes les escales (hors repas) :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li><span class="font-bold text-green-700">Total Escales : 585.50 €</span></li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Coût estimé des repas :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li>Petits-déjeuners (hors El Andaluz) : 96 €</li>
+                        <li>Déjeuners : 480 €</li>
+                        <li>Goûters : 160 €</li>
+                        <li>Dîners : 560 €</li>
+                        <li><span class="font-bold text-green-700">Sous-total Repas : 1296 €</span></li>
+                    </ul>
+                    <li class="font-semibold text-lg text-blue-600 mt-4">Budget Total Général Estimé (Europa-Park + Escales + Repas) :</li>
+                    <ul class="list-circle list-inside ml-4 space-y-1">
+                        <li><span class="font-bold text-green-700">Total Général : 3964.50 €</span></li>
+                    </ul>
+                    <li class="text-sm text-gray-600 mt-4">Ce budget ne comprend pas les dépenses personnelles.</li>
+                    <li class="text-xs text-gray-500 mt-2">Estimation du carburant basée sur une consommation de 8L/100km et un prix de 1.90€/L pour le SP95. Les coûts des péages sont des estimations. Les coûts des repas sont basés sur les estimations fournies pour 4 personnes (3 petits-déjeuners à 8€/pers; 8 déjeuners à 15€/pers; 8 goûters à 5€/pers; 7 dîners à 20€/pers.).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Nouveau tableau récapitulatif des dépenses par poste -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('summary-expenses')">
+                <h2 class="text-2xl sm:text-3xl font-bold">📊 Récapitulatif des Dépenses par Poste</h2>
+                <span id="arrow-summary-expenses" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-summary-expenses" class="p-4 hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg shadow-md text-left">
+                        <thead>
+                            <tr class="bg-blue-100 text-blue-800 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">Poste de Dépense</th>
+                                <th class="py-3 px-6 text-right">Coût Estimé (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700 text-sm font-light">
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left whitespace-nowrap">Séjour Europa-Park (Hôtel + Billets)</td>
+                                <td class="py-3 px-6 text-right">2083.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Hébergement (Escales)</td>
+                                <td class="py-3 px-6 text-right">301.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Activités (Escales)</td>
+                                <td class="py-3 px-6 text-right">127.30</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Carburant</td>
+                                <td class="py-3 px-6 text-right">85.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Péages</td>
+                                <td class="py-3 px-6 text-right">65.00</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Transports en commun Strasbourg</td>
+                                <td class="py-3 px-6 text-right">7.20</td>
+                            </tr>
+                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-3 px-6 text-left">Repas</td>
+                                <td class="py-3 px-6 text-right">1296.00</td>
+                            </tr>
+                            <tr class="font-bold bg-blue-50 text-blue-800">
+                                <td class="py-3 px-6 text-left">Total Général Estimé</td>
+                                <td class="py-3 px-6 text-right">3964.50</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Ce tableau récapitule les dépenses estimées par catégorie. Les montants sont basés sur les détails fournis dans le budget détaillé.</p>
+            </div>
+        </div>
+
+        <!-- Nouvelle Section: Liste de Colisage -->
+        <div class="mb-4 bg-gray-200 rounded-lg shadow-md overflow-hidden mt-6">
+            <div class="p-4 cursor-pointer flex justify-between items-center bg-blue-600 text-white rounded-t-lg" onclick="toggleDay('packing-list')">
+                <h2 class="text-2xl sm:text-3xl font-bold">🎒 Liste de Colisage</h2>
+                <span id="arrow-packing-list" class="transform transition-transform duration-300">▼</span>
+            </div>
+            <div id="content-packing-list" class="p-4 hidden">
+                <div id="packingListAddControls" class="flex mb-4 add-item-controls">
+                    <input type="text" id="newItemInput" placeholder="Ajouter un élément à la liste..." class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="addItemButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg transition duration-300 ease-in-out">
+                        Ajouter
+                    </button>
+                </div>
+                <div id="packingListItems" class="bg-white rounded-lg shadow-inner">
+                    <p class="text-center text-gray-500 p-4" id="packingListStatus">Chargement de la liste...</p>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Cette liste est collaborative et sauvegardée en temps réel. Les changements sont visibles par tous ceux qui accèdent à ce planning.</p>
+                <p class="text-xs text-gray-500 mt-1">Votre identifiant utilisateur pour cette session est : <span id="userIdDisplay" class="font-bold">Chargement...</span></p>
+            </div>
+        </div>
+
+        <!-- Password Unlock Section (Moved to bottom) -->
+        <div class="password-controls mt-6">
+            <input type="password" id="passwordInput" placeholder="Mot de passe pour modifier..." class="password-input">
+            <button id="unlockButton" class="password-unlock-btn">Déverrouiller</button>
+            <button id="relockButton" class="password-relock-btn">Re-verrouiller</button>
+        </div>
+        <p id="passwordMessage" class="text-sm text-red-600 mb-4 hidden text-center">Mot de passe incorrect.</p>
+
+    </div>
+
+    <!-- Modale pour ajouter/modifier un événement -->
+    <div id="eventModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeEventModal">&times;</button>
+            <h3 class="text-xl font-bold text-gray-800 mb-4 text-left" id="modalTitle">Ajouter un événement</h3>
+            
+            <div class="mb-4">
+                <label for="modalEventDate" class="block text-gray-700 text-sm font-bold mb-2 text-left">Jour :</label>
+                <input type="date" id="modalEventDate" class="add-input w-full" disabled> <!-- Date will be pre-filled and disabled -->
+            </div>
+
+            <div class="modal-form-grid">
+                <div>
+                    <label for="modalEventStartTime">Heure de début :</label>
+                    <input type="time" id="modalEventStartTime" class="add-input w-full">
+                </div>
+                <div>
+                    <label for="modalEventEndTime">Heure de fin :</label>
+                    <input type="time" id="modalEventEndTime" class="add-input w-full">
+                </div>
+            </div>
+            <label for="modalEventSubject" class="block text-gray-700 text-sm font-bold mb-2 text-left">Objet de l'événement :</label>
+            <input type="text" id="modalEventSubject" placeholder="Ex: Achat souvenirs" class="add-input w-full mb-4">
+            
+            <label for="modalEventLink" class="block text-gray-700 text-sm font-bold mb-2 text-left">Lien (vidéo, info...) :</label>
+            <input type="url" id="modalEventLink" placeholder="Ex: https://youtube.com/watch?v=..." class="add-input w-full mb-4">
+
+            <button id="saveEventButton" class="add-item-btn w-full">Ajouter l'événement</button>
+            <input type="hidden" id="editingEventId"> <!-- Hidden field to store ID of event being edited -->
+            <input type="hidden" id="editingEventDay"> <!-- Hidden field to store day of event being edited -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, getDocs, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURATION OPENWEATHERMAP ---
+        const OPENWEATHER_API_KEY = "51aebd101995305de8a90d128247bdad"; 
+
+        // --- Global Variables ---
+        const MOCK_PASSWORD = "EP2025";
+        const passwordInput = document.getElementById('passwordInput');
+        const unlockButton = document.getElementById('unlockButton');
+        const relockButton = document.getElementById('relockButton');
+        const passwordMessage = document.getElementById('passwordMessage');
+
+        let db;
+        let auth;
+        let userId = 'Chargement...';
+        let appId;
+        let packingListColRef;
+        let eventsColRef; // This will now correctly use 'events' as per v5.html
+
+        // --- Speech Synthesis Variables ---
+        let currentUtterance = null; // To keep track of the current speech
+        let isSpeaking = false;
+
+        // --- Countdown Logic ---
+        const vacationStartDate = new Date('2025-07-20T09:30:00');
+        const vacationEndDate = new Date('2025-07-27T18:00:00');
+
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const countdownTitleElement = document.querySelector('.countdown-title');
+
+            const updateCountdown = () => {
+                const now = new Date().getTime();
+
+                if (now < vacationStartDate.getTime()) {
+                    const distance = vacationStartDate - now;
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = "Départ dans :";
+                    countdownElement.innerHTML = `
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${days}</span>
+                            <span class="countdown-label">J</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${hours}</span>
+                            <span class="countdown-label">H</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${minutes}</span>
+                            <span class="countdown-label">M</span>
+                        </div>
+                        <div class="countdown-unit">
+                            <span class="countdown-value">${seconds}</span>
+                            <span class="countdown-label">S</span>
+                        </div>
+                    `;
+                } else if (now >= vacationStartDate.getTime() && now < vacationEndDate.getTime()) {
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
+                    countdownTitleElement.textContent = "";
+                    countdownElement.innerHTML = `<div class="text-green-700 font-bold text-base sm:text-lg">🎉 Les vacances ont commencé !</div>`;
+                } else {
+                    const elapsedDistance = now - vacationEndDate.getTime();
+                    const days = Math.floor((elapsedDistance / (1000 * 60 * 60 * 24)));
+                    const hours = Math.floor((elapsedDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((elapsedDistance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((elapsedDistance % (1000 * 60)) / 1000);
+
+                    countdownTitleElement.textContent = "";
+                    countdownElement.innerHTML = `
+                        <div class="text-red-700 font-bold text-base sm:text-lg">Vacances terminées 😔</div>
+                        <div class="text-red-600 text-sm mt-1">depuis ${days}J ${hours}H ${minutes}M ${seconds}S</div>
+                    `;
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval); 
+                    }
+                }
+            };
+
+            window.countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
+
+        // --- Météo en temps réel via OpenWeatherMap ---
+        const weatherDisplay = document.getElementById('weatherDisplay');
+
+        async function fetchWeatherData(city) {
+            const currentWeatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
+            const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=fr`;
+
+            let currentWeatherData = null;
+            let tomorrowForecastData = null;
+
+            try {
+                const currentWeatherResponse = await fetch(currentWeatherApiUrl);
+                if (!currentWeatherResponse.ok) {
+                    throw new Error(`Erreur HTTP: ${currentWeatherResponse.status} pour la météo actuelle de ${city}`);
+                }
+                currentWeatherData = await currentWeatherResponse.json();
+
+                const forecastResponse = await fetch(forecastApiUrl);
+                if (!forecastResponse.ok) {
+                    throw new Error(`Erreur HTTP: ${forecastResponse.status} pour les prévisions de ${city}`);
+                }
+                const forecastData = await forecastResponse.json();
+
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+
+                const tomorrowEntries = forecastData.list.filter(entry => {
+                    const entryDate = new Date(entry.dt * 1000);
+                    entryDate.setHours(0, 0, 0, 0);
+                    return entryDate.getTime() === tomorrow.getTime();
+                });
+
+                if (tomorrowEntries.length > 0) {
+                    const middayTomorrow = new Date(tomorrow);
+                    middayTomorrow.setHours(12, 0, 0, 0);
+
+                    tomorrowForecastData = tomorrowEntries.reduce((prev, curr) => {
+                        const prevDiff = Math.abs(new Date(prev.dt * 1000).getTime() - middayTomorrow.getTime());
+                        const currDiff = Math.abs(new Date(curr.dt * 1000).getTime() - middayTomorrow.getTime());
+                        return (currDiff < prevDiff) ? curr : prev;
+                    });
+                }
+
+            } catch (error) {
+                console.error(`Erreur lors de la récupération des données météo pour ${city}:`, error);
+            }
+
+            return { current: currentWeatherData, tomorrow: tomorrowForecastData };
+        }
+
+        function renderWeather(weatherData, todayElementId, tomorrowElementId) {
+            const todayElement = document.getElementById(todayElementId);
+            const tomorrowElement = document.getElementById(tomorrowElementId);
+
+            if (weatherData.current && todayElement) {
+                const temperature = Math.round(weatherData.current.main.temp);
+                const description = weatherData.current.weather[0].description;
+                const iconCode = weatherData.current.weather[0].icon;
+                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+                todayElement.innerHTML = `
+                    <img src="${iconUrl}" alt="${description}" class="inline-block w-8 h-8 align-middle mr-1">
+                    ${description.charAt(0).toUpperCase() + description.slice(1)}, ${temperature}°C
+                `;
+            } else if (todayElement) {
+                todayElement.innerHTML = `N/A`;
+            }
+
+            if (weatherData.tomorrow && tomorrowElement) {
+                const temperature = Math.round(weatherData.tomorrow.main.temp);
+                const description = weatherData.tomorrow.weather[0].description;
+                const iconCode = weatherData.tomorrow.weather[0].icon;
+                const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+                tomorrowElement.innerHTML = `
+                    <img src="${iconUrl}" alt="${description}" class="inline-block w-8 h-8 align-middle mr-1">
+                    ${description.charAt(0).toUpperCase() + description.slice(1)}, ${temperature}°C
+                `;
+            } else if (tomorrowElement) {
+                tomorrowElement.innerHTML = `N/A`;
+            }
+        }
+
+        async function loadAllWeather() {
+            const cities = [
+                { name: 'Colmar', todayId: 'weather-colmar-today', tomorrowId: 'weather-colmar-tomorrow' },
+                { name: 'Rust', todayId: 'weather-rust-today', tomorrowId: 'weather-rust-tomorrow' },
+                { name: 'Strasbourg', todayId: 'weather-strasbourg-today', tomorrowId: 'weather-strasbourg-tomorrow' },
+                { name: 'Salins-les-Bains', todayId: 'weather-salins-today', tomorrowId: 'weather-salins-tomorrow' }
+            ];
+
+            for (const cityInfo of cities) {
+                const data = await fetchWeatherData(cityInfo.name);
+                renderWeather(data, cityInfo.todayId, cityInfo.tomorrowId);
+            }
+        }
+
+        // --- Date Highlight Logic ---
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function updateDayHighlight() {
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+
+            document.querySelectorAll('.day-section').forEach(card => {
+                card.classList.remove('highlight-today');
+            });
+
+            const todayCard = document.querySelector(`.day-section[data-day-date="${todayFormatted}"]`);
+
+            if (todayCard) {
+                todayCard.classList.add('highlight-today');
+                todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // --- Firebase/Firestore Initialization ---
+        async function initializeFirebase() {
+            try {
+                // Using the hardcoded firebaseConfig from the provided file
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBbJTLdUfYicbfRIWpa1UI2hriGEWtrsZA",
+                    authDomain: "base-vacances-ete-2025.firebaseapp.com",
+                    projectId: "base-vacances-ete-2025",
+                    storageBucket: "base-vacances-ete-2025.firebasestorage.app",
+                    messagingSenderId: "446416873148",
+                    appId: "1:446416873148:web:f1b23b0d98785da53c52b9"
+                };
+
+                appId = firebaseConfig.projectId; 
+
+                if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                    console.error("Firebase config is missing or incomplete.");
+                    packingListStatus.textContent = "Erreur: La configuration Firebase est manquante ou incomplète. Les fonctionnalités collaboratives ne sont pas disponibles.";
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        userIdDisplay.textContent = userId;
+                        console.log("Utilisateur connecté:", userId);
+                        packingListColRef = collection(db, `artifacts/${appId}/public/data/packingList`);
+                        // IMPORTANT: Using 'events' collection name as per user's working v5.html and rules
+                        eventsColRef = collection(db, `artifacts/${appId}/public/data/events`); 
+                        await initializePackingListFromStaticData(); // Initialize packing list
+                        setupPackingListListener(); // Setup listener after potential initialization
+                        await initializeEventsFromStaticData();
+                        setupEventsListeners(); // Start listening for event changes
+                        enableAllControls(false); // Ensure locked state on initial load
+                    } else {
+                        // Only attempt signInWithCustomToken if __initial_auth_token is provided by the environment
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            try {
+                                console.log("Attempting sign-in with custom token...");
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } catch (customTokenError) {
+                                console.error("Erreur lors de la connexion avec token personnalisé:", customTokenError);
+                                console.log("Retour à la connexion anonyme en raison d'une erreur de jeton personnalisé.");
+                                await signInAnonymously(auth); // Fallback if custom token fails
+                            }
+                        } else {
+                            console.log("Aucun jeton personnalisé fourni, connexion anonyme.");
+                            await signInAnonymously(auth); // Sign in anonymously if no custom token
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation de Firebase:", error);
+                packingListStatus.textContent = "Erreur: Impossible d'initialiser Firebase. Vérifiez votre connexion ou la configuration.";
+            }
+        }
+
+        // --- Global Control Management (Lock/Unlock) ---
+        function enableAllControls(enabled) {
+            // Manage password input and buttons
+            passwordInput.classList.toggle('hidden', enabled);
+            unlockButton.classList.toggle('hidden', enabled);
+            relockButton.style.display = enabled ? 'inline-block' : 'none';
+            passwordMessage.classList.add('hidden'); // Hide any error messages
+
+            // Manage planning items and plus buttons
+            document.querySelectorAll('.day-section').forEach(daySection => {
+                const plusButton = daySection.querySelector('.add-event-plus-btn');
+                const planningItems = daySection.querySelectorAll('.planning-item');
+                const deleteButtons = daySection.querySelectorAll('.planning-item .delete-btn');
+
+                if (plusButton) {
+                    plusButton.disabled = !enabled;
+                    plusButton.style.display = enabled ? 'inline-flex' : 'none'; // Show/hide plus button
+                }
+
+                planningItems.forEach(item => {
+                    item.classList.toggle('unlocked', enabled); // Add/remove 'unlocked' class for CSS
+                    // Only apply pointer-events: none to the item itself for editing, not its children links
+                    item.style.pointerEvents = enabled ? 'auto' : 'none';
+                    item.style.cursor = enabled ? 'pointer' : 'default';
+                });
+
+                deleteButtons.forEach(btn => {
+                    btn.style.display = enabled ? 'inline-block' : 'none';
+                    btn.disabled = !enabled;
+                });
+            });
+
+            // Manage packing list controls
+            const packingListAddControls = document.getElementById('packingListAddControls');
+            if (packingListAddControls) {
+                packingListAddControls.classList.toggle('unlocked', enabled); // Add/remove 'unlocked' class for CSS
+                packingListAddControls.querySelectorAll('input, button').forEach(control => {
+                    control.disabled = !enabled;
+                });
+            }
+            document.querySelectorAll('#packingListItems .packing-list-item .delete-btn').forEach(btn => {
+                btn.style.display = enabled ? 'inline-block' : 'none';
+                btn.disabled = !enabled;
+            });
+            document.querySelectorAll('#packingListItems input[type="checkbox"]').forEach(checkbox => {
+                checkbox.disabled = !enabled;
+            });
+        }
+
+        function reLockControls() {
+            enableAllControls(false);
+            passwordInput.value = '';
+        }
+
+        // --- Event Management (Planning) ---
+        const eventModalOverlay = document.getElementById('eventModalOverlay');
+        const closeEventModalBtn = document.getElementById('closeEventModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalEventDate = document.getElementById('modalEventDate');
+        const modalEventStartTime = document.getElementById('modalEventStartTime');
+        const modalEventEndTime = document.getElementById('modalEventEndTime');
+        const modalEventSubject = document.getElementById('modalEventSubject');
+        const modalEventLink = document.getElementById('modalEventLink'); // New link input
+        const saveEventButton = document.getElementById('saveEventButton');
+        const editingEventId = document.getElementById('editingEventId');
+        const editingEventDay = document.getElementById('editingEventDay');
+
+        // Initial static planning data (from the original HTML, now used for initial DB population)
+        const initialPlanningData = {
+            '2025-07-20': [
+                { startTime: '09:30', endTime: '09:30', subject: 'Départ de Charvieu-Chavagneux' },
+                { startTime: '09:30', endTime: '11:30', subject: 'Trajet Charvieu-Chavagneux vers point de pause (environ 2h de route)' },
+                { startTime: '11:30', endTime: '12:30', subject: 'Pause Déjeuner en Route (1 heure) - Pique-nique ou repas rapide.' },
+                { startTime: '12:30', endTime: '14:30', subject: 'Reprise du Trajet vers Colmar (environ 2h de route)' },
+                { startTime: '14:30', endTime: '15:00', subject: 'Arrivée à Colmar et Check-in à l\'Hôtel Primo' },
+                { startTime: '15:00', endTime: '17:00', subject: 'Visite du Musée du Jouet de Colmar', link: 'https://www.youtube.com/watch?v=your_colmar_toy_museum_video' },
+                { startTime: '17:00', endTime: '19:00', subject: 'Balade dans la Petite Venise et le centre historique' },
+                { startTime: '19:00', endTime: '21:00', subject: 'Dîner à Colmar' },
+                { startTime: '21:00', endTime: '23:00', subject: 'Retour à l\'hôtel et Nuit' },
+            ],
+            '2025-07-21': [
+                { startTime: '09:00', endTime: '10:00', subject: 'Lever et Petit-déjeuner à l\'Hôtel Primo Colmar, puis check-out.' },
+                { startTime: '10:00', endTime: '10:40', subject: 'Route de Colmar au Château du Haut-Kœnigsbourg (environ 40 min de route)' },
+                { startTime: '10:40', endTime: '12:40', subject: 'Visite du Château du Haut-Kœnigsbourg (environ 2 heures)', link: 'https://www.youtube.com/watch?v=f2wN64j-O7c' },
+                { startTime: '12:40', endTime: '13:40', subject: 'Déjeuner (Pique-nique ou restauration rapide/simple)' },
+                { startTime: '13:40', endTime: '14:40', subject: 'Route du Château du Haut-Kœnigsbourg à Europa-Park (Rust) (environ 1h de route)' },
+                { startTime: '15:30', endTime: '15:30', subject: 'Arrivée à l\'hôtel El Andaluz et Check-in' },
+                { startTime: '17:00', endTime: '23:00', subject: 'Installation et Détente à l\'hôtel El Andaluz. Dîner et nuit sur place.' },
+            ],
+            '2025-07-22': [
+                { startTime: '09:00', endTime: '22:00', subject: 'Journée complète à Europa-Park. Profitez des attractions et spectacles !', link: 'https://www.youtube.com/watch?v=your_europapark_video' }
+            ],
+            '2025-07-23': [
+                { startTime: '09:00', endTime: '22:00', subject: 'Deuxième journée pour explorer les différents univers et attractions d\'Europa-Park.', link: 'https://www.youtube.com/watch?v=your_europapark_video_2' }
+            ],
+            '2025-07-24': [
+                { startTime: '10:00', endTime: '19:00', subject: 'Journée aquatique à Rulantica ! Préparez maillot de bain et serviettes.', link: 'https://www.youtube.com/watch?v=your_rulantica_video' }
+            ],
+            '2025-07-25': [
+                { startTime: '09:00', endTime: '15:00', subject: 'Dernière matinée à Europa-Park. Profitez des attractions favorites.', link: 'https://www.youtube.com/watch?v=your_europapark_video_3' },
+                { startTime: '15:00', endTime: '16:00', subject: 'Départ d\'Europa-Park vers Lingolsheim (environ 50 min - 1h de route).' },
+                { startTime: '16:00', endTime: '22:00', subject: 'Arrivée et installation à l\'Hôtel Campanile Strasbourg - Lingolsheim. Dîner et première nuit sur place.' }
+            ],
+            '2025-07-26': [
+                { startTime: '08:30', endTime: '09:30', subject: 'Lever et Petit-déjeuner à l\'hôtel.' },
+                { startTime: '09:30', endTime: '10:00', subject: 'Trajet en bus L1 puis tram (lignes A ou D) vers le centre-ville (20-30 min).' },
+                { startTime: '10:00', endTime: '12:00', subject: 'Visite de la Cathédrale Notre-Dame de Strasbourg.', link: 'https://www.youtube.com/watch?v=your_strasbourg_cathedral_video' },
+                { startTime: '12:00', endTime: '14:00', subject: 'Déjeuner (Pique-nique ou boulangerie/sandwicherie).' },
+                { startTime: '14:00', endTime: '15:30', subject: 'Excursion en Bateau-Mouche Batorama (Présence à 14h00 pour départ à 14h15).', link: 'https://www.youtube.com/watch?v=your_batorama_video' },
+                { startTime: '15:30', endTime: '17:30', subject: 'Balade dans la Petite France et les Ponts Couverts.' },
+                { startTime: '17:30', endTime: '18:30', subject: 'Détente au Parc de l\'Orangerie (optionnel).' },
+                { startTime: '19:00', endTime: '21:00', subject: 'Dîner à Strasbourg.' },
+                { startTime: '21:00', endTime: '23:00', subject: 'Retour à l\'hôtel et Nuit.' }
+            ],
+            '2025-07-27': [
+                { startTime: '08:00', endTime: '09:00', subject: 'Lever et Petit-déjeuner à l\'hôtel.' },
+                { startTime: '09:00', endTime: '09:30', subject: 'Préparation et Check-out de l\'hôtel.' },
+                { startTime: '09:30', endTime: '13:00', subject: 'Trajet de Lingolsheim à Salins-les-Bains (environ 3h30 de route).' },
+                { startTime: '13:00', endTime: '14:00', subject: 'Déjeuner à Salins-les-Bains.' },
+                { startTime: '14:00', endTime: '16:00', subject: 'Visite des Grandes Salines de Salins-les-Bains (environ 1h30 à 2h).', link: 'https://www.youtube.com/watch?v=your_salines_video' },
+                { startTime: '16:00', endTime: '18:00', subject: 'Trajet de Salins-les-Bains à Charvieu-Chavagneux (environ 2h de route).' },
+                { startTime: '18:00', endTime: '18:00', subject: 'Arrivée à votre domicile. Fin des vacances !' }
+            ]
+        };
+
+
+        async function initializeEventsFromStaticData() {
+            const dayDates = Object.keys(initialPlanningData);
+            console.log("Début de l'initialisation des événements statiques.");
+
+            for (const dayDate of dayDates) {
+                // Query Firestore for events specific to this day
+                const qExistingDayEvents = query(eventsColRef, where('dayId', '==', dayDate));
+                const snapshot = await getDocs(qExistingDayEvents);
+                
+                if (snapshot.empty) { // Check if the snapshot is empty for this specific day
+                    console.log(`Initialisation des événements pour ${dayDate} depuis les données statiques. Ajout de ${initialPlanningData[dayDate].length} événements.`);
+                    let order = 0;
+                    for (const event of initialPlanningData[dayDate]) {
+                        try {
+                            await addDoc(eventsColRef, {
+                                dayId: dayDate,
+                                startTime: event.startTime,
+                                endTime: event.endTime || '',
+                                subject: event.subject,
+                                link: event.link || '', // Save the link
+                                order: order++,
+                                createdAt: serverTimestamp(),
+                                createdBy: userId
+                            });
+                            console.log(`Ajouté événement pour ${dayDate}: ${event.subject}`);
+                        } catch (addError) {
+                            console.error(`Erreur lors de l'ajout de l'événement pour ${dayDate} (${event.subject}):`, addError);
+                        }
+                    }
+                } else {
+                    console.log(`Événements déjà présents pour ${dayDate} (${snapshot.docs.length} trouvés). Pas d'initialisation depuis les données statiques.`);
+                }
+            }
+            console.log("Fin de l'initialisation des événements statiques.");
+        }
+
+        function setupEventsListeners() {
+            console.log("Configuration des écouteurs d'événements.");
+            document.querySelectorAll('.day-section').forEach(daySection => {
+                const dayDate = daySection.dataset.dayDate;
+                const planningContentDiv = document.getElementById(`planningContent-${dayDate}`);
+                
+                // Query for events specific to this day, ordered by startTime
+                // IMPORTANT: This query requires a composite index on dayId (asc) and startTime (asc)
+                // If you get a "The query requires an index" error, click the link in the console to create it.
+                const q = query(
+                    collection(db, `artifacts/${appId}/public/data/events`),
+                    where('dayId', '==', dayDate),
+                    orderBy('startTime')
+                );
+
+                onSnapshot(q, (snapshot) => {
+                    const dayEvents = [];
+                    snapshot.forEach((doc) => {
+                        dayEvents.push({ id: doc.id, ...doc.data() });
+                    });
+                    console.log(`Événements chargés pour ${dayDate}:`, dayEvents); // Debug log
+                    renderDayPlanning(dayDate, dayEvents);
+                }, (error) => {
+                    console.error(`Erreur lors de la récupération des événements pour ${dayDate}:`, error); // Error log
+                    if (planningContentDiv) {
+                        planningContentDiv.innerHTML = `<p class="text-center text-red-600">Erreur de chargement des événements pour ${dayDate}.</p>`;
+                    }
+                });
+            });
+            console.log("Écouteurs d'événements configurés.");
+        }
+
+        function renderDayPlanning(dayDate, items) {
+            const planningContentDiv = document.getElementById(`planningContent-${dayDate}`);
+            if (!planningContentDiv) {
+                console.warn(`Div de contenu de planning non trouvée pour le jour: ${dayDate}`);
+                return;
+            }
+
+            planningContentDiv.innerHTML = '';
+
+            if (items.length === 0) {
+                planningContentDiv.innerHTML = '<p class="text-center text-gray-500">Aucun événement planifié pour cette journée. Ajoutez-en un !</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'planning-item';
+                itemDiv.dataset.id = item.id;
+                itemDiv.dataset.day = dayDate;
+                
+                let timeDisplay = item.startTime;
+                if (item.endTime && item.startTime !== item.endTime) {
+                    timeDisplay += ` - ${item.endTime}`;
+                }
+
+                let linkHtml = '';
+                if (item.link) {
+                    linkHtml = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:underline ml-2 text-sm">🔗 Lien</a>`;
+                }
+
+                itemDiv.innerHTML = `
+                    <span class="time">${timeDisplay} :</span> 
+                    <span>${item.subject}</span>
+                    ${linkHtml}
+                    <button class="delete-btn ml-auto">Supprimer</button>
+                `;
+
+                const deleteButton = itemDiv.querySelector('.delete-btn');
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Remplacé confirm par un log console
+                    console.log(`Confirmation de suppression de l'événement ${item.id} pour le jour ${dayDate}.`);
+                    deletePlanningItem(dayDate, item.id);
+                });
+
+                itemDiv.addEventListener('click', (e) => { // Added event parameter
+                    // Prevent editing when clicking on a link
+                    if (e.target.tagName === 'A') {
+                        return;
+                    }
+                    if (unlockButton.classList.contains('hidden')) {
+                        editPlanningItem(dayDate, item.id);
+                    } else {
+                        console.log("Interface verrouillée. Déverrouillez pour modifier les événements.");
+                    }
+                });
+                
+                planningContentDiv.appendChild(itemDiv);
+            });
+            enableAllControls(unlockButton.classList.contains('hidden'));
+        }
+
+        async function savePlanningItem() {
+            const day = editingEventDay.value;
+            const startTime = modalEventStartTime.value;
+            const endTime = modalEventEndTime.value;
+            const subject = modalEventSubject.value.trim();
+            const link = modalEventLink.value.trim(); // Get the link
+            const idToEdit = editingEventId.value;
+
+            if (!day || !startTime || !subject) {
+                console.warn("Veuillez remplir au moins le jour, l'heure de début et l'objet de l'événement.");
+                // Remplacer alert par une boîte de dialogue personnalisée
+                return;
+            }
+
+            try {
+                if (idToEdit) {
+                    await updateDoc(doc(db, `artifacts/${appId}/public/data/events`, idToEdit), {
+                        startTime: startTime,
+                        endTime: endTime,
+                        subject: subject,
+                        link: link // Save the link
+                    });
+                    console.log("Événement mis à jour:", idToEdit);
+                } else {
+                    await addDoc(eventsColRef, {
+                        dayId: day,
+                        startTime: startTime,
+                        endTime: endTime,
+                        subject: subject,
+                        link: link, // Save the link
+                        createdAt: serverTimestamp(),
+                        createdBy: userId
+                    });
+                    console.log("Nouvel événement ajouté pour le jour:", day);
+                }
+                closeEventModal();
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde de l'événement:", error);
+                // Remplacer alert par une boîte de dialogue personnalisée
+            }
+        }
+
+        async function deletePlanningItem(dayDate, idToDelete) {
+            // Remplacé confirm par un log console
+            console.log(`Confirmation de suppression de l'événement ${idToDelete} pour le jour ${dayDate}.`);
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/events`, idToDelete));
+                console.log("Événement supprimé avec succès:", idToDelete);
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'événement:", error);
+                // Remplacer alert par une boîte de dialogue personnalisée
+            }
+        }
+
+        function editPlanningItem(dayDate, itemId) {
+            const itemDiv = document.querySelector(`#planningContent-${dayDate} [data-id="${itemId}"]`);
+            if (!itemDiv) {
+                console.error("Élément de planning non trouvé pour l'édition:", itemId);
+                return;
+            }
+
+            // Fetch the actual data from Firestore to get the link
+            const eventRef = doc(db, `artifacts/${appId}/public/data/events`, itemId);
+            getDoc(eventRef).then(docSnap => {
+                if (docSnap.exists()) {
+                    const item = docSnap.data();
+                    modalTitle.textContent = "Modifier l'événement";
+                    modalEventDate.value = dayDate;
+                    modalEventStartTime.value = item.startTime;
+                    modalEventEndTime.value = item.endTime || '';
+                    modalEventSubject.value = item.subject;
+                    modalEventLink.value = item.link || ''; // Populate the link
+                    editingEventId.value = itemId;
+                    editingEventDay.value = dayDate;
+                    eventModalOverlay.classList.add('show');
+                } else {
+                    console.error("Aucun document trouvé pour l'ID:", itemId);
+                }
+            }).catch(error => {
+                console.error("Erreur lors de la récupération du document pour édition:", error);
+            });
+        }
+
+        function openAddEventModal(dayDate) {
+            modalTitle.textContent = "Ajouter un événement";
+            modalEventDate.value = dayDate;
+            modalEventStartTime.value = '';
+            modalEventEndTime.value = '';
+            modalEventSubject.value = '';
+            modalEventLink.value = ''; // Clear the link field
+            editingEventId.value = '';
+            editingEventDay.value = dayDate;
+
+            eventModalOverlay.classList.add('show');
+        }
+
+        function closeEventModal() {
+            eventModalOverlay.classList.remove('show');
+        }
+
+        // --- Packing List Management ---
+        const packingListItems = document.getElementById('packingListItems');
+        const newItemInput = document.getElementById('newItemInput');
+        const addItemButton = document.getElementById('addItemButton');
+        const packingListStatus = document.getElementById('packingListStatus');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const packingListAddControls = document.getElementById('packingListAddControls');
+
+        const defaultPackingList = [
+            // Documents et Argent
+            { text: 'Passeports / Cartes d\'identité', checked: false },
+            { text: 'Billets (train, avion, parcs)', checked: false },
+            { text: 'Permis de conduire', checked: false },
+            { text: 'Cartes de crédit / Argent liquide', checked: false },
+            { text: 'Assurance voyage', checked: false },
+            { text: 'Copies des documents importants (numérique et papier)', checked: false },
+            { text: 'Carnet de santé / Ordonnances', checked: false },
+
+            // Vêtements (pour 7 jours + parc aquatique)
+            { text: 'Sous-vêtements (x7-8)', checked: false },
+            { text: 'Chaussettes (x7-8)', checked: false },
+            { text: 'T-shirts / Hauts (x7-8)', checked: false },
+            { text: 'Pantalons / Shorts (x3-4)', checked: false },
+            { text: 'Robes / Jupes (si applicable)', checked: false },
+            { text: 'Maillots de bain (x2 par personne pour Rulantica)', checked: false },
+            { text: 'Serviettes de bain (pour Rulantica, si non fournies)', checked: false },
+            { text: 'Pyjamas', checked: false },
+            { text: 'Veste légère / Gilet', checked: false },
+            { text: 'Imperméable / K-Way (très utile à Europa-Park)', checked: false },
+            { text: 'Pull / Sweat (soirées fraîches)', checked: false },
+            { text: 'Chaussures confortables de marche (indispensable pour les parcs)', checked: false },
+            { text: 'Sandales / Tongs (pour Rulantica et détente)', checked: false },
+            { text: 'Chapeau / Casquette', checked: false },
+            { text: 'Lunettes de soleil', checked: false },
+
+            // Trousse de toilette
+            { text: 'Brosse à dents et dentifrice', checked: false },
+            { text: 'Shampoing et après-shampoing', checked: false },
+            { text: 'Gel douche / Savon', checked: false },
+            { text: 'Crème solaire (indispensable !)', checked: false },
+            { text: 'Après-soleil', checked: false },
+            { text: 'Déodorant', checked: false },
+            { text: 'Brosse à cheveux / Peigne', checked: false },
+            { text: 'Maquillage (si applicable)', checked: false },
+            { text: 'Produits pour les cheveux (gel, laque...)', checked: false },
+            { text: 'Rasoir et crème à raser', checked: false },
+            { text: 'Lentilles de contact et produits (si applicable)', checked: false },
+            { text: 'Petite trousse de premiers secours (pansements, désinfectant, antidouleur)', checked: false },
+            { text: 'Lingettes désinfectantes / Gel hydroalcoolique', checked: false },
+            { text: 'Mouchoirs', checked: false },
+            { text: 'Baume à lèvres', checked: false },
+            { text: 'Répulsif moustiques', checked: false },
+
+            // Électronique
+            { text: 'Téléphones portables et chargeurs', checked: false },
+            { text: 'Batterie externe / Power bank', checked: false },
+            { text: 'Appareil photo et cartes mémoire', checked: false },
+            { text: 'Adaptateur de prise (si nécessaire pour l\'Allemagne)', checked: false },
+            { text: 'Tablette / Ordinateur portable (si besoin)', checked: false },
+            { text: 'Écouteurs', checked: false },
+
+            // Pour les enfants
+            { text: 'Jouets / Livres / Activités pour le voyage', checked: false },
+            { text: 'Doudous / Objets de confort', checked: false },
+            { text: 'Petits sacs à dos pour les parcs', checked: false },
+            { text: 'Snacks et gourdes réutilisables', checked: false },
+            { text: 'Lingettes bébé (même pour les grands, ça dépanne !)', checked: false },
+            { text: 'Couches (si applicable)', checked: false },
+            { text: 'Poussette / Porte-bébé (si applicable)', checked: false },
+
+            // Divers
+            { text: 'Petit sac à dos pour les excursions journalières', checked: false },
+            { text: 'Gourde réutilisable', checked: false },
+            { text: 'Sacs réutilisables pour les courses / souvenirs', checked: false },
+            { text: 'Petit parapluie', checked: false },
+            { text: 'Coussin de voyage (pour la voiture)', checked: false },
+            { text: 'Couverture légère (pour la voiture)', checked: false },
+            { text: 'Snacks pour la route', checked: false },
+            { text: 'Bouteilles d\'eau', checked: false },
+            { text: 'Petite glacière', checked: false },
+            { text: 'Sacs poubelle (pour la voiture)', checked: false },
+            { text: 'Chargeurs de téléphone pour voiture', checked: false },
+            { text: 'Musique / Podcasts / Livres audio pour la route', checked: false },
+            { text: 'Jeu de cartes / Petits jeux de société', checked: false },
+            { text: 'Crayon et papier', checked: false },
+            { text: 'Masque de nuit et bouchons d\'oreilles', checked: false },
+            { text: 'Petit cadenas (pour casier à Rulantica si besoin)', checked: false },
+            { text: 'Sacs à linge sale', checked: false },
+            { text: 'Sacs de congélation (pour organiser les affaires)', checked: false },
+            { text: 'Couteau suisse (attention aux règles de sécurité)', checked: false },
+            { text: 'Ouvre-bouteille / Tire-bouchon', checked: false },
+            { text: 'Petite lampe de poche', checked: false },
+            { text: 'Kit de couture de voyage', checked: false },
+            { text: 'Petits cadeaux / souvenirs pour la famille / amis', checked: false },
+            { text: 'Matériel de lecture (livres, magazines)', checked: false },
+            { text: 'Carnet de voyage / Journal', checked: false },
+            { text: 'Stylo', checked: false },
+            { text: 'Pince à linge et petite corde (pour sécher maillots)', checked: false }
+        ];
+
+        async function initializePackingListFromStaticData() {
+            console.log("Début de l'initialisation de la liste de colisage.");
+            const existingItemsSnapshot = await getDocs(packingListColRef);
+            const existingItemsText = new Set(existingItemsSnapshot.docs.map(doc => doc.data().text));
+
+            for (const item of defaultPackingList) {
+                if (!existingItemsText.has(item.text)) {
+                    try {
+                        await addDoc(packingListColRef, {
+                            text: item.text,
+                            checked: item.checked,
+                            createdAt: serverTimestamp(),
+                            createdBy: userId
+                        });
+                        console.log("Ajouté élément de colisage par défaut:", item.text);
+                    } catch (error) {
+                        console.error("Erreur lors de l'ajout de l'élément de colisage statique:", item.text, error);
+                    }
+                } else {
+                    console.log("L'élément de colisage existe déjà:", item.text);
+                }
+            }
+            console.log("Fin de l'initialisation de la liste de colisage.");
+        }
+
+        function setupPackingListListener() {
+            const q = query(packingListColRef, orderBy('createdAt'));
+            onSnapshot(q, (snapshot) => {
+                const items = [];
+                snapshot.forEach((doc) => {
+                    items.push({ id: doc.id, ...doc.data() });
+                });
+                console.log("Liste de colisage chargée:", items);
+                renderPackingList(items);
+            }, (error) => {
+                console.error("Erreur lors de la récupération de la liste de colisage:", error);
+                packingListStatus.textContent = "Erreur: Impossible de charger la liste de colisage. Vérifiez les règles de sécurité Firestore.";
+            });
+        }
+
+        function renderPackingList(items) {
+            packingListItems.innerHTML = '';
+            if (items.length === 0) {
+                packingListItems.innerHTML = '<p class="text-center text-gray-500 p-4">Votre liste est vide. Ajoutez des éléments !</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `packing-list-item ${item.checked ? 'checked' : ''} bg-white hover:bg-gray-50`;
+                itemDiv.dataset.id = item.id;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'checkbox-custom';
+                checkbox.checked = item.checked;
+                checkbox.addEventListener('change', () => {
+                    if (unlockButton.classList.contains('hidden')) {
+                        toggleItem(item.id, item.checked);
+                    } else {
+                        checkbox.checked = !checkbox.checked;
+                        console.log("Interface verrouillée. Déverrouillez pour modifier la liste de colisage.");
+                    }
+                });
+
+                const label = document.createElement('label');
+                label.textContent = item.text;
+                label.className = 'item-text';
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-btn';
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.addEventListener('click', () => {
+                    if (unlockButton.classList.contains('hidden')) {
+                        console.log(`Confirmation de suppression de l'élément de colisage ${item.id}.`);
+                        deleteItem(item.id);
+                    } else {
+                        console.log("Interface verrouillée. Déverrouillez pour modifier la liste de colisage.");
+                    }
+                });
+
+                itemDiv.appendChild(checkbox);
+                itemDiv.appendChild(label);
+                itemDiv.appendChild(deleteButton);
+
+                packingListItems.appendChild(itemDiv);
+            });
+            packingListStatus.textContent = '';
+            enableAllControls(unlockButton.classList.contains('hidden'));
+        }
+
+        async function addItem() {
+            const newItemText = newItemInput.value.trim();
+            if (newItemText === '') {
+                console.warn("Le champ ne peut pas être vide.");
+                // Remplacer alert par une boîte de dialogue personnalisée
+                return;
+            }
+
+            try {
+                await addDoc(packingListColRef, {
+                    text: newItemText,
+                    checked: false,
+                    createdAt: serverTimestamp(),
+                    createdBy: userId
+                });
+                newItemInput.value = '';
+                console.log("Élément de colisage ajouté:", newItemText);
+            }
+            catch (error) {
+                console.error("Erreur lors de l'ajout de l'élément:", error);
+                // Remplacer alert par une boîte de dialogue personnalisée
+            }
+        }
+
+        async function toggleItem(itemId, currentCheckedStatus) {
+            try {
+                await updateDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId), {
+                    checked: !currentCheckedStatus
+                });
+                console.log("Élément de colisage mis à jour:", itemId);
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de l'élément:", error);
+                // Remplacer alert par une boîte de dialogue personnalisée
+            }
+        }
+
+        async function deleteItem(itemId) {
+            // Remplacé confirm par un log console
+            console.log(`Tentative de suppression de l'élément de colisage ${itemId}.`);
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/packingList`, itemId));
+                console.log("Élément de colisage supprimé avec succès:", itemId);
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'élément:", error);
+                // Remplacer alert par une boîte de dialogue personnalisée
+            }
+        }
+
+        // --- Speech Synthesis (Text-to-Speech) Logic ---
+
+        // Function to build the summary text for a given day
+        function buildDaySummaryText(dayDate, events) {
+            let summary = `Voici le programme détaillé pour le ${new Date(dayDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}. `;
+
+            if (events.length === 0) {
+                summary += "Il n'y a pas d'événements planifiés pour cette journée.";
+                return summary;
+            }
+
+            events.forEach((event, index) => {
+                let eventText = '';
+                if (event.startTime) {
+                    eventText += `À ${event.startTime}`;
+                    if (event.endTime && event.startTime !== event.endTime) {
+                        eventText += ` et jusqu'à ${event.endTime}`;
+                    }
+                    eventText += `, `;
+                }
+                eventText += `${event.subject}. `;
+                
+                // Add more descriptive sentences for key events/places
+                if (dayDate === '2025-07-20') {
+                    if (event.subject.includes('Départ de Charvieu-Chavagneux')) {
+                        eventText += "Votre grande aventure commence !";
+                    } else if (event.subject.includes('Musée du Jouet de Colmar')) {
+                        eventText += "Plongez dans le monde merveilleux des jeux et des jouets, un régal pour petits et grands.";
+                    } else if (event.subject.includes('Petite Venise')) {
+                        eventText += "Profitez d'une balade charmante dans les ruelles pittoresques de Colmar, un véritable enchantement.";
+                    }
+                } else if (dayDate === '2025-07-21') {
+                    if (event.subject.includes('Château du Haut-Kœnigsbourg')) {
+                        eventText += "Découvrez cette forteresse médiévale impressionnante, perchée sur la montagne, offrant des vues spectaculaires.";
+                    } else if (event.subject.includes('Europa-Park')) {
+                        eventText += "Bienvenue à Europa-Park, l'un des meilleurs parcs d'attractions au monde !";
+                    }
+                } else if (dayDate === '2025-07-22' || dayDate === '2025-07-23' || dayDate === '2025-07-25') {
+                    if (event.subject.includes('Europa-Park')) {
+                        eventText += "Préparez-vous à une journée pleine d'adrénaline et de magie avec des attractions pour tous les âges et des spectacles grandioses.";
+                    }
+                } else if (dayDate === '2025-07-24') {
+                    if (event.subject.includes('Rulantica')) {
+                        eventText += "Une journée de folie aquatique vous attend à Rulantica, avec des toboggans palpitants et des piscines relaxantes.";
+                    }
+                } else if (dayDate === '2025-07-26') {
+                    if (event.subject.includes('Cathédrale Notre-Dame de Strasbourg')) {
+                        eventText += "Admirez la grandeur de cette cathédrale emblématique, un chef-d'œuvre de l'architecture gothique.";
+                    } else if (event.subject.includes('Bateau-Mouche Batorama')) {
+                        eventText += "Détendez-vous lors d'une croisière commentée pour découvrir Strasbourg sous un autre angle.";
+                    } else if (event.subject.includes('Petite France')) {
+                        eventText += "Flânez dans le quartier historique de la Petite France, avec ses charmantes maisons à colombages et ses canaux pittoresques.";
+                    }
+                } else if (dayDate === '2025-07-27') {
+                    if (event.subject.includes('Grandes Salines de Salins-les-Bains')) {
+                        eventText += "Explorez ce site historique unique, classé au patrimoine mondial de l'UNESCO, et découvrez l'histoire du sel.";
+                    } else if (event.subject.includes('Arrivée à votre domicile')) {
+                        eventText += "Vos merveilleuses vacances se terminent ici. Nous espérons que vous avez fait le plein de souvenirs !";
+                    }
+                }
+                summary += eventText;
+            });
+
+            return summary;
+        }
+
+        // Function to speak the summary
+        window.speakDaySummary = function(dayDate, buttonElement) {
+            if (!('speechSynthesis' in window)) {
+                console.error("La synthèse vocale n'est pas supportée par ce navigateur.");
+                alert("Votre navigateur ne supporte pas la synthèse vocale."); // Fallback alert
+                return;
+            }
+
+            // Check if speech is currently active
+            if (isSpeaking) {
+                // If the same button was clicked AND it's the current utterance, stop it.
+                if (currentUtterance && currentUtterance.dayDate === dayDate) {
+                    window.speechSynthesis.cancel();
+                    isSpeaking = false;
+                    buttonElement.classList.remove('speaking'); // Remove highlight from this button
+                    currentUtterance = null; // Clear the reference
+                    console.log(`Lecture arrêtée pour le jour ${dayDate}.`);
+                    return; // Exit, as the request was to stop
+                } else {
+                    // If a different button was clicked, cancel current speech before starting new one
+                    window.speechSynthesis.cancel();
+                    isSpeaking = false;
+                    // Remove 'speaking' class from ALL buttons, as the previous one is now stopped
+                    document.querySelectorAll('.speaker-button').forEach(btn => btn.classList.remove('speaking'));
+                    currentUtterance = null; // Clear the reference
+                    console.log("Lecture précédente arrêtée.");
+                }
+            }
+
+            // Get events for the day
+            // We need to fetch from Firestore because initialPlanningData is only for initial seeding
+            const q = query(
+                eventsColRef,
+                where('dayId', '==', dayDate),
+                orderBy('startTime')
+            );
+
+            getDocs(q).then(snapshot => {
+                const dayEvents = [];
+                snapshot.forEach(doc => {
+                    dayEvents.push(doc.data());
+                });
+
+                if (dayEvents.length === 0) {
+                    console.warn(`Aucun événement trouvé dans Firestore pour le jour ${dayDate}.`);
+                    const textToSpeak = `Il n'y a pas d'événements planifiés pour le ${new Date(dayDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}.`;
+                    currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                    currentUtterance.lang = 'fr-FR';
+                    currentUtterance.dayDate = dayDate;
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const frenchVoice = voices.find(voice => voice.lang === 'fr-FR' || voice.lang === 'fr_FR');
+                    if (frenchVoice) {
+                        currentUtterance.voice = frenchVoice;
+                    }
+                    
+                    currentUtterance.onstart = () => { isSpeaking = true; buttonElement.classList.add('speaking'); };
+                    currentUtterance.onend = () => { isSpeaking = false; buttonElement.classList.remove('speaking'); currentUtterance = null; };
+                    currentUtterance.onerror = (event) => { isSpeaking = false; buttonElement.classList.remove('speaking'); currentUtterance = null; console.error('Erreur de synthèse vocale:', event.error); };
+                    window.speechSynthesis.speak(currentUtterance);
+                    return;
+                }
+
+                const textToSpeak = buildDaySummaryText(dayDate, dayEvents);
+                currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                currentUtterance.lang = 'fr-FR'; // Set language to French
+                currentUtterance.dayDate = dayDate; // Store dayDate on the utterance for comparison
+
+                // Find a French voice if available
+                const voices = window.speechSynthesis.getVoices();
+                const frenchVoice = voices.find(voice => voice.lang === 'fr-FR' || voice.lang === 'fr_FR');
+                if (frenchVoice) {
+                    currentUtterance.voice = frenchVoice;
+                } else {
+                    console.warn("Voix française non trouvée, utilisant la voix par défaut.");
+                }
+
+                currentUtterance.onstart = () => {
+                    isSpeaking = true;
+                    buttonElement.classList.add('speaking');
+                    console.log(`Début de la lecture pour le jour ${dayDate}.`);
+                };
+
+                currentUtterance.onend = () => {
+                    isSpeaking = false;
+                    buttonElement.classList.remove('speaking');
+                    currentUtterance = null;
+                    console.log(`Fin de la lecture pour le jour ${dayDate}.`);
+                };
+
+                currentUtterance.onerror = (event) => {
+                    isSpeaking = false;
+                    buttonElement.classList.remove('speaking');
+                    currentUtterance = null;
+                    console.error('Erreur de synthèse vocale:', event.error);
+                    alert(`Erreur lors de la lecture du planning: ${event.error}`); // Fallback alert
+                };
+
+                window.speechSynthesis.speak(currentUtterance);
+            }).catch(error => {
+                console.error(`Erreur lors de la récupération des événements pour la synthèse vocale pour ${dayDate}:`, error);
+                alert(`Erreur lors de la récupération des données pour la lecture: ${error.message}`); // Fallback alert
+            });
+        };
+
+        // Ensure voices are loaded before trying to set a specific voice
+        window.speechSynthesis.onvoiceschanged = () => {
+            // This event fires when voices are loaded.
+            // No action needed here, as speakDaySummary will fetch voices when called.
+        };
+
+
+        // --- Event Listeners ---
+        window.toggleDay = function(dayId) {
+            const content = document.getElementById(`content-${dayId}`);
+            const arrow = document.getElementById(`arrow-${dayId}`);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotated');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotated');
+            }
+        };
+
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                unlockButton.click(); // Simulate click on unlock button
+            }
+        });
+
+        unlockButton.addEventListener('click', () => {
+            if (passwordInput.value === MOCK_PASSWORD) {
+                enableAllControls(true);
+            } else {
+                passwordMessage.textContent = "Mot de passe incorrect.";
+                passwordMessage.classList.remove('hidden');
+            }
+        });
+        relockButton.addEventListener('click', reLockControls);
+
+        document.querySelectorAll('.add-event-plus-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const dayDate = e.target.dataset.dayTarget;
+                openAddEventModal(dayDate);
+            });
+        });
+
+        saveEventButton.addEventListener('click', savePlanningItem);
+
+        closeEventModalBtn.addEventListener('click', closeEventModal);
+        eventModalOverlay.addEventListener('click', (e) => {
+            if (e.target === eventModalOverlay) {
+                closeEventModal();
+            }
+        });
+
+        addItemButton.addEventListener('click', addItem);
+        newItemInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !newItemInput.disabled) {
+                addItem();
+            }
+        });
+
+        // --- Initial Load ---
+        window.onload = function() {
+            startCountdown();
+            updateDayHighlight();
+            loadAllWeather(); // Initial load of weather
+            initializeFirebase();
+        };
+    </script>
+</body>
+</html>
